@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+	<style>
+	body {
+	  display: flex;
+	  justify-content: center; /* Centraliza horizontalmente */
+	  align-items: center;     /* Centraliza verticalmente */
+	  min-height: 100vh;       /* Garante que o body ocupe toda a altura da tela */
+	  margin: 0;               /* Remove margens padrão do body */
+		}
+	</style>
+
+</head>
+<body>
+
+ 
+    <form id="loginForm">
+    <h1>Login - Mapas PMRO</h1>
+        <label for="usuario">Usuário:</label><br>
+        <input type="text" id="usuario" name="usuario" required><br><br>
+        <label for="senha">Senha:</label><br>
+        <input type="password" id="senha" name="senha" required><br><br>
+        <button type="submit">Entrar</button>
+    </form>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o envio tradicional do formulário
+
+            const usuario = document.getElementById('usuario').value;
+            const senha = document.getElementById('senha').value;
+
+            // --- Lógica de Autenticação (Exemplo Simples) ---
+            // Em um site real, você enviaria isso para um servidor (PHP, Node.js, etc.)
+            if (usuario === 'normal' && senha === 'maPs$51') {
+                //alert('Login bem-sucedido!'); //retirei esse alerta para agilizar (ass.: daniel)
+                // Redireciona para a próxima página
+                window.location.href = 'https://urbanismopmro.github.io/Mapas/Interno'; // Substitua pela sua URL
+            } else {
+                alert('Usuário ou senha inválidos.');
+            }
+        });
+    </script>
+</body>
+</html>
