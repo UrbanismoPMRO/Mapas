@@ -1,0 +1,58 @@
+body {
+  font-family: 'Calibri', sans-serif;
+  font-size: 14px;
+  line-height: 1.3; 
+}
+h1 {
+  font-family: 'Gill Sans', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  font-style: normal;
+  color: #6f6c54;
+  padding: 4px;
+  border-radius: 10px;
+  background: #f2eee6;  
+}
+notas {
+  font-family: 'Gill Sans', sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  font-style: normal;
+  color: #92110b;
+  padding: 6px;
+  border-radius: 10px;
+  background: #f5d4d4;
+  margin-bottom: 9px;
+    line-height: 1.5; 
+}
+atencao {
+  font-family: 'Gill Sans', sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  font-style: normal;
+  color: #000000;
+
+}
+table {
+    border-collapse: collapse; /* Colapsa as bordas para um visual mais limpo */
+    width: 100%; /* Opcional: faz a tabela ocupar toda a largura disponível */
+    margin-bottom: 20px; /* Adiciona espaço abaixo de cada tabela */
+    font-size: 13px
+  
+}
+
+/* Estilo para células (cabeçalho e dados) */
+th, td {
+    border: 1px solid; /* Define a largura e tipo da borda */
+    padding: 2px; /* Espaçamento interno para melhor leitura */
+    text-align: left; /* Alinha o texto à esquerda */
+}
+
+/* --- Estilo Tabela Vermelha --- */
+.tabela-simples th,
+.tabela-simples td {
+    border-color: #989898; /* Cor da borda: vermelho */
+}
+.tabela-simples thead {
+    background-color: #ffcccc; /* Cor de fundo suave para o cabeçalho */
+}
