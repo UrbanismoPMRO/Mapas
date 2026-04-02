@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Folder><name>nova_camada_de_rascunho</name>
+  <Placemark id="nova_camada_de_rascunho.1">
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <MultiGeometry><Polygon><outerBoundaryIs><LinearRing><coordinates>-41.9175797705188,-22.5138837313775 -41.9178066154204,-22.5137531880345 -41.9178735532602,-22.5138253304235 -41.917635552052,-22.5139730504358 -41.9175797705188,-22.5138837313775</coordinates></LinearRing></outerBoundaryIs></Polygon></MultiGeometry>
+  </Placemark>
+</Folder>
+</Document></kml>
