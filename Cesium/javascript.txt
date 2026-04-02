@@ -1,0 +1,68 @@
+link para oprojeto: https://sandcastle.cesium.com/#c=dVNdbxoxEPwrK15ykYgPQtJILUFNQVEjBSEV1L7cQ4y93Fn1rZG9B6JV/nt9X2lF23u583h2djzrS1N4IsNGWvMDgQuEOQZTlfDV4BE9GGrAz5vlM6DFEonhaLho0BfVcOeOWBpC/wJPC5GRchQYDq3APRAeO1HRiiYXZ3UXQ/iZEQCj9xF439M37VrsvCu/OW91BySXw4xeLz9AfDLKKE3h0Z4aS0qW6CWwg7UkePSSlAnKgeRmOzcHJLCOcsOVxiFYyd2XJA0FmrzgeITWvGjVxM6eNi5pLGoMbCgWOYI3n3PpOX5JmjRWF5h7xJBcja+vxc347nYIkzvx7ja+b0aj2juA8yZG2es00hDbS20o/y28lFwIdl8iLCkkI9FVA+wNq+K/xKvxbU99bZLqUnrQup/var2ET5WxdcMQTw+5dVtpYbKAbQ/HdE4xhX6iPb4xFgNyHK08SsO9B+VRMq5C+Sb7EE6kkrp7l2dQSCj23pTxyh0wCKl1cibbjHUwHEwDnyzO2uMCfDTl3nmGyttEiJSx3MfZYUi3lfqOLFQIdaOaOk3/LJ1qcwCj77PB2a3LBqCsDCHu7Cpr1/EHyAazaRr5f5Va10xmdUAfM6lpxXj23IJCiGkal/+uZOfsVvoz5V8
+
+###codigo javascript abaixo
+
+// Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+const viewer = new Cesium.Viewer('cesiumContainer', {
+  terrain: Cesium.Terrain.fromWorldTerrain(),
+  //conj 01: habilita sombras: ok//shadows: true, // Habilita sombras globalmente
+  //conj 01: habilita sombras: ok//terrainShadows: Cesium.ShadowMode.RECEIVE_ONLY // Opcional: terreno recebe sombra
+});    
+
+//configura o relogio para coincidir o horario normal sem a diferenca de 3 horas
+viewer.animation.viewModel.timeFormatter = function(date, viewModel) {
+  date = Cesium.JulianDate.toDate(date);
+  return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+};
+
+
+
+//viewer.clock.currentTime = new Cesium.JulianDate(2461213.125);
+viewer.clock.shouldAnimate = true;
+viewer.shadows = true;
+viewer.terrainShadows = Cesium.ShadowMode.ENABLED;
+viewer.timeline.currentTime = new Cesium.JulianDate(2461397.2083333335)
+//viewer.clock.clockMode = Cesium.ClockMode.CLOCK_SYSTEM_TIME;
+viewer.timeline.updateFromClock();
+
+
+//viewer.timeline.makeLabel = function(time) {
+//    var date = Cesium.JulianDate.toDate(time);
+//    date.setHours(date.getHours() - 3); // Ajuste de fuso
+//    return date.toUTCString(); // Exibe no fuso ajustado
+//};
+
+
+// Fly the camera to San Francisco at the given longitude, latitude, and height.
+viewer.camera.flyTo({
+  destination : Cesium.Cartesian3.fromDegrees(-41.918617, -22.514955, 100),
+  orientation : {
+    heading : Cesium.Math.toRadians(0.0),
+    pitch : Cesium.Math.toRadians(-15.0),
+  }
+});
+
+// Add Cesium OSM Buildings, a global 3D buildings layer.
+const buildingTileset = await Cesium.createOsmBuildingsAsync();
+viewer.scene.primitives.add(buildingTileset);   
+
+
+Sandcastle.addToolbarButton("Solstício de Verão - 17h", function () {
+  var dataEspecifica = Cesium.JulianDate.fromIso8601('2026-12-22T20:00:00Z');
+  viewer.clock.currentTime = dataEspecifica;
+  // Define o horário de início e fim
+  var dataInicial = Cesium.JulianDate.fromIso8601("2026-12-21T00:00:00Z");
+  var dataFinal = Cesium.JulianDate.fromIso8601("2026-12-22T00:00:00Z");
+  // Sincroniza a Timeline visual com as novas configurações do Clock
+  viewer.timeline.zoomTo(dataInicial, dataFinal);
+});
+
+Sandcastle.addToolbarButton("Solstício de Inverno - 15h", function () {
+  var dataEspecifica = Cesium.JulianDate.fromIso8601('2026-06-21T18:00:00Z');
+  viewer.clock.currentTime = dataEspecifica;
+  // Define o horário de início e fim
+  var dataInicial = Cesium.JulianDate.fromIso8601("2026-06-20T00:00:00Z");
+  var dataFinal = Cesium.JulianDate.fromIso8601("2026-06-21T00:00:00Z");
+  // Sincroniza a Timeline visual com as novas configurações do Clock
+  viewer.timeline.zoomTo(dataInicial, dataFinal);
+});

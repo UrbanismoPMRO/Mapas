@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Include the CesiumJS JavaScript and CSS files -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.139.1/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.139.1/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script type="module">
+    // Your access token can be found at: https://ion.cesium.com/tokens.
+    // This is the default access token from your ion account
+
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyZDc2MzgyZS1kOGE0LTRlN2MtYjIzZi0xN2RmZTFkMjE1OGMiLCJpZCI6NDExOTAyLCJpYXQiOjE3NzQ5NzM4MTJ9.omFBwBT9qScebZD3MZQ4WhlaeZSirGvMYDjTJXOuHQQ';
+
+    // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+	//habilita sombra (por mim com ajuda da ia google)
+	shadows: true, // Habilita sombras globalmente
+	terrainShadows: Cesium.ShadowMode.RECEIVE_ONLY // Opcional: terreno recebe sombra
+	viewer.clock.currentTime = new Cesium.JulianDate(2457522.154792);
+
+
+
+    });    
+
+    // Fly the camera to San Francisco at the given longitude, latitude, and height.
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(-41.924149, -22.527438, 100),
+      orientation: {
+        heading: Cesium.Math.toRadians(0.0),
+        pitch: Cesium.Math.toRadians(-15.0),
+      }
+    });
+
+    // Add Cesium OSM Buildings, a global 3D buildings layer.
+    const buildingTileset = await Cesium.createOsmBuildingsAsync();
+    viewer.scene.primitives.add(buildingTileset);   
+  </script>
+ </div>
+</body>
+</html>
