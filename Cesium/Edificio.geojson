@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "Edificio",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Nome": "Ed. Faísca", "Altura": 16.0 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -41.916136888193819, -22.514763178054061 ], [ -41.916456702317404, -22.514581105568595 ], [ -41.916586859228175, -22.514746001414728 ], [ -41.916263326335702, -22.51494868562278 ], [ -41.916136888193819, -22.514763178054061 ] ] ] ] } }
+]
+}
