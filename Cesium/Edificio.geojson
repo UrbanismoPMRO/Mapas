@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "Edificio",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Nome": "Ed. Mirante", "Cota máxima": 26.0 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -41.916760132587484, -22.515243954771748 ], [ -41.916609086667897, -22.515051753784739 ], [ -41.916433020956333, -22.515179988229651 ], [ -41.91657395466806, -22.515374708647851 ], [ -41.916760132587484, -22.515243954771748 ] ] ] ] } }
+]
+}
