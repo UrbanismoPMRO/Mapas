@@ -7,8 +7,25 @@
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.140/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 </head>
 <body>
-  <div id="cesiumContainer"></div>
-   <script type="module" src="js/script.js"></script>
+<style>
+  @import url(../templates/bucket.css);
+</style>
+  <div id="cesiumContainer" class="fullSize"></div>
+  <div id="loadingOverlay"><h1>Loading...</h1></div>
+  <script type="module" src="js/script.js"></script>
  </div>
 </body>
 </html>
+
+
+
+
+
+
+<!-- HTML -->
+<div id="toolbar"></div>
+<div style="position: absolute; top: 120px; left: 10px; background: white; padding: 10px; z-index: 100;">
+    <input type="number" id="lat" placeholder="Latitude" value="0.0" step="0.01"><br>
+    <input type="number" id="lon" placeholder="Longitude" value="0.0" step="0.01"><br>
+    <p>Cota máxima</p><input type="number" id="alt" placeholder="Altitude" value="0" step="1"><br>
+</div>
