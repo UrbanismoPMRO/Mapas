@@ -137,3 +137,26 @@ function VistaSuperior() {
   viewer.projectionPicker.viewModel.switchToOrthographic();
 };
 
+
+//carregar arquivo
+document.getElementById('btnCarregaArquivo').addEventListener('click', () => {
+  document.getElementById('inputArquivo').click();
+});
+
+document.getElementById('inputArquivo').addEventListener('change', (event) => {
+  const arquivo = event.target.files[0];
+  
+  if (arquivo) {
+    const leitor = new FileReader();
+    leitor.onload = function(e) {
+      const conteudo = e.target.result;
+      console.log('Conteúdo do arquivo:', conteudo);
+      // Processar arquivo GeoJSON
+    };
+    leitor.readAsText(arquivo);
+  }
+    for (let arquivo of arquivos) {
+    console.log('Caminho relativo:', arquivo.webkitRelativePath); 
+    // Saída: "pasta/subfasta/arquivo.geojson"
+  }
+});

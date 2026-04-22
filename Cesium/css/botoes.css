@@ -59,6 +59,19 @@
     cursor: pointer;
     z-index: 999;
 }
+#btnCarregaArquivo {
+    position: absolute;
+    top: 110px;
+    left: 160px;
+    padding: 10px 20px;
+    background-color: #e9cc4d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 999;
+}
+
 
 
 #frmControles {

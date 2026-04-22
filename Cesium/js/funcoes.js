@@ -31,10 +31,12 @@ function carregarLimite() {
     });
 }
 
-function carregaEdificio() {
+function carregaEdificio(ArquivoCarregado) {
     const VarEdificio = Cesium.GeoJsonDataSource.load('https://urbanismopmro.github.io/Mapas/Cesium/Geometrias/Edificio_BlocoDuplo.geojson', {
-        clampToGround: true
-    });
+         clampToGround: true 
+        }); //orignial, antes de abrir arquivo pela janela de carregamento de arquivos
+    
+
     VarEdificio.then(function (dataSource) {
         viewer.dataSources.add(dataSource);
         // Zoom para o polígono
