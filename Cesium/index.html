@@ -1,16 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.140/Build/Cesium/Cesium.js"></script>
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.140/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-  <link rel="stylesheet" href="http://localhost:5500/Cesium/css/style.css"> /*lembrar de tornar o caminho absoluto em relativo*/
-  
+  /*lembrar de tornar o caminho absoluto em relativo dos css*/
+  <link rel="stylesheet" href="http://localhost:5500/Cesium/css/style.css">
+  <link rel="stylesheet" href="http://localhost:5500/Cesium/css/botoes.css">
+
 </head>
+
 <body>
   <div id="cesiumContainer"></div>
-  <button id="btnCarregaLimiteSombra">Carregar Limite</button>
-  <button id="btnCarregaPoligono">Carregar Polígono</button>
-  <script type="module" src="js/index.js"></script>
+  <button id="btnCarregaEdificacao">Carregar Edificação</button>
+  <button id="btn3D">3D</button>
+  <button id="btn2D">2D</button>
+  <button id="btnVistaSuperior">Visão Superior</button>
+  <button id="btnTeste">Teste</button>
+
+  <--Menu de controle-->
+    <div id="frmControles">
+      <p>Cota máxima</p><input type="number" id="boxAlturaEdif" placeholder="Altura" value="0" step="1"><br>
+      <p>Marco Astronômico</p>
+      <input type="range" id="sliderMarcoAstronomico" min="1" max="9" value="0">
+      <p id="labelMarco">Selecione</p>
+    </div>
+
+    <script type="module" src="js/index.js"></script>
 </body>
+
 </html>
