@@ -155,8 +155,8 @@ document.getElementById('inputArquivo').addEventListener('change', (event) => {
     };
     leitor.readAsText(arquivo);
   }
-    for (let arquivo of arquivos) {
+    
     console.log('Caminho relativo:', arquivo.webkitRelativePath); 
     // Saída: "pasta/subfasta/arquivo.geojson"
-  }
+  
 });
