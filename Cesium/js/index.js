@@ -150,13 +150,24 @@ document.getElementById('inputArquivo').addEventListener('change', (event) => {
     const leitor = new FileReader();
     leitor.onload = function(e) {
       const conteudo = e.target.result;
-      console.log('Conteúdo do arquivo:', conteudo);
-      // Processar arquivo GeoJSON
+      
+      // Converter string para objeto JSON
+      const dados = JSON.parse(conteudo);
+      
+      // Carregar no Cesium
+      Cesium.GeoJsonDataSource.load(dados, {
+        stroke: Cesium.Color.YELLOW,
+        fill: Cesium.Color.YELLOW.withAlpha(0.5),
+        strokeWidth: 2,
+        clampToGround: true
+      }).then(function(dataSource) {
+        viewer.dataSources.add(dataSource);
+        viewer.zoomTo(dataSource);
+        console.log('Arquivo carregado com sucesso!');
+      }).catch(function(erro) {
+        alert('Erro ao carregar arquivo: ' + erro);
+      });
     };
     leitor.readAsText(arquivo);
   }
-    
-    console.log('Caminho relativo:', arquivo.webkitRelativePath); 
-    // Saída: "pasta/subfasta/arquivo.geojson"
-  
 });
