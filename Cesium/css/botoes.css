@@ -47,6 +47,30 @@
     cursor: pointer;
     z-index: 999;
 }
+#btnMedir {
+    position: absolute;
+    top: 360px;
+    left: 80px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 999;
+}
+#btnMedirApagar {
+    position: absolute;
+    top: 360px;
+    left: 150px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 999;
+}
 #btnTeste {
     position: absolute;
     top: 600px;

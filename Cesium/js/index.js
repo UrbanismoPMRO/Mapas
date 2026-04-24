@@ -1,6 +1,7 @@
 import { TokenCesium } from './config.js';
 import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta } from './funcoes.js';
 import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
+import { Medir, ApagarMedicao } from './Medir.js'
 // Your access token can be found at: https://ion.cesium.com/tokens.
 // This is the default access token from your ion account
 
@@ -121,9 +122,14 @@ document.getElementById('btnVistaSuperior').addEventListener('click', () => {
   VistaSuperior();
 });
 
-document.getElementById('btnTeste').addEventListener('click', () => {
-//11
+document.getElementById('btnMedir').addEventListener('click', () => {
+Medir();
 });
+
+document.getElementById('btnMedirApagar').addEventListener('click', () => {
+ApagarMedicao();
+});
+
 
 function VistaSuperior() {
   const NovoAlvo = {
@@ -171,3 +177,5 @@ document.getElementById('inputArquivo').addEventListener('change', (event) => {
     leitor.readAsText(arquivo);
   }
 });
+
+
