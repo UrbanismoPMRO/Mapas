@@ -33,7 +33,9 @@ Medir.setInputAction(function (click) {
                 polyline: {
                     positions: activePoints,
                     width: 3,
-                    material: Cesium.Color.RED
+                    material: Cesium.Color.RED,
+                    depthFailMaterial: Cesium.Color.GREEN.withAlpha(0.3) // Cor para quando a linha estiver atrás do terreno
+                    //clampToGround: true // Garantir que a linha siga o terreno: Achei melhor sem para que a linha fique representada numa reta se os contornos do terreno.
                 }
             }));
 
@@ -74,11 +76,13 @@ Medir.setInputAction(function (movement) {
             if (!previewLine) {
                 previewLine = viewer.entities.add({
                     polyline: {
-                        positions: new Cesium.CallbackProperty(function() {
+                        positions: new Cesium.CallbackProperty(function () {
                             return [activePoints[0], currentMousePosition];
                         }, false),
                         width: 2,
-                        material: Cesium.Color.YELLOW.withAlpha(0.7) // Linha semi-transparente
+                        material: Cesium.Color.YELLOW.withAlpha(0.7), // Linha semi-transparente
+                        depthFailMaterial: Cesium.Color.GREEN.withAlpha(0.3), // Cor para quando a linha estiver atrás do terreno
+                        clampToGround: true // Garantir que a linha siga o terreno
                     }
                 });
             }
