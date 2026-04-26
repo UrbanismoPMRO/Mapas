@@ -1,7 +1,7 @@
 import { TokenCesium } from './config.js';
 import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta } from './funcoes.js';
 import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
-import { Medir, ApagarMedicao } from './Medir.js'
+import { Medir, ApagarMedicao, DesligarMedir } from './Medir.js'
 // Your access token can be found at: https://ion.cesium.com/tokens.
 // This is the default access token from your ion account
 
@@ -37,7 +37,6 @@ let varLatitude = -22.479147;
 let varAltura = 300;
 let varCartesiano;
 let varCartografico;
-let evento = false;
 
 handler.setInputAction(function (click) {
   // 4. Selecionar o objeto clicado
@@ -131,6 +130,21 @@ document.getElementById('btnMedirApagar').addEventListener('click', () => {
 ApagarMedicao();
 });
 
+document.getElementById('btnDesligarMedir').addEventListener('click', () => {
+DesligarMedir();
+  /*  if (evento == false) {
+    selTeste();
+    evento = true;
+    console.log(evento);
+    //break;
+  } else {
+  if (evento == true) {
+    selTeste();
+    evento = false;
+    console.log(evento);
+  }
+}*/
+});
 
 document.getElementById('btnTeste').addEventListener('click', () => {
   if (evento == false) {
@@ -146,6 +160,8 @@ document.getElementById('btnTeste').addEventListener('click', () => {
   }
 }
 });
+
+
 function VistaSuperior() {
   const NovoAlvo = {
     destination: Cesium.Cartesian3.fromDegrees(varLongitude, varLatitude, 300),

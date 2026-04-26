@@ -7,10 +7,20 @@ let distanceLabels = [];
 let previewLine = null; // Linha de pré-visualização que acompanha o mouse
 let previewLabel = null; // Etiqueta de pré-visualização da medida
 let currentMousePosition = null; // Posição atual do mouse para a pré-visualização
+let Medida
 
+function DesligarMedir() {
+    if (Medida) {
+        Medida.destroy();
+        Medida = null;
+    }
+}
 // 3. Capturar cliques do mouse
-const Medir = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-Medir.setInputAction(function (click) {
+function Medir(click) { //<o
+Medida = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+Medida.setInputAction(function (click) {
+//function Medir(click) { //<o
+//handler.setInputAction(function (click) { //<oS1
     // Converter posição do mouse para coordenadas cartesianas
     const ray = viewer.camera.getPickRay(click.position);
     const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
@@ -69,8 +79,10 @@ Medir.setInputAction(function (click) {
     }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
+
 // 4. Capturar movimento do mouse para pré-visualização
-Medir.setInputAction(function (movement) {
+
+Medida.setInputAction(function (movement) {
     if (activePoints.length === 1) {
         // Converter posição do mouse para coordenadas cartesianas
         const ray = viewer.camera.getPickRay(movement.endPosition);
@@ -117,6 +129,7 @@ Medir.setInputAction(function (movement) {
         }
     }
 }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+}//<o
 
 function ApagarMedicao() {
     // Remover linha de pré-visualização
@@ -147,4 +160,4 @@ function ApagarMedicao() {
     activePoints = [];
 }
 
-export { Medir, ApagarMedicao };
+export { Medir, ApagarMedicao, DesligarMedir };
