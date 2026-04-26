@@ -37,6 +37,7 @@ let varLatitude = -22.479147;
 let varAltura = 300;
 let varCartesiano;
 let varCartografico;
+let evento = false;
 
 handler.setInputAction(function (click) {
   // 4. Selecionar o objeto clicado
@@ -131,6 +132,20 @@ ApagarMedicao();
 });
 
 
+document.getElementById('btnTeste').addEventListener('click', () => {
+  if (evento == false) {
+    selTeste();
+    evento = true;
+    console.log(evento);
+    //break;
+  } else {
+  if (evento == true) {
+    selTeste();
+    evento = false;
+    console.log(evento);
+  }
+}
+});
 function VistaSuperior() {
   const NovoAlvo = {
     destination: Cesium.Cartesian3.fromDegrees(varLongitude, varLatitude, 300),

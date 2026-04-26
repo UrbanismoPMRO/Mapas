@@ -5,6 +5,7 @@ let activePoints = [];
 let lineEntities = [];
 let distanceLabels = [];
 let previewLine = null; // Linha de pré-visualização que acompanha o mouse
+let previewLabel = null; // Etiqueta de pré-visualização da medida
 let currentMousePosition = null; // Posição atual do mouse para a pré-visualização
 
 // 3. Capturar cliques do mouse
@@ -26,6 +27,11 @@ Medir.setInputAction(function (click) {
             if (previewLine) {
                 viewer.entities.remove(previewLine);
                 previewLine = null;
+            }
+            // Remover etiqueta de pré-visualização
+            if (previewLabel) {
+                viewer.entities.remove(previewLabel);
+                previewLabel = null;
             }
 
             // Desenhar Linha
@@ -86,6 +92,28 @@ Medir.setInputAction(function (movement) {
                     }
                 });
             }
+
+            // Criar ou atualizar a etiqueta de pré-visualização
+            if (!previewLabel) {
+                previewLabel = viewer.entities.add({
+                    position: new Cesium.CallbackProperty(function () {
+                        return Cesium.Cartesian3.midpoint(activePoints[0], currentMousePosition, new Cesium.Cartesian3());
+                    }, false),
+                    label: {
+                        text: new Cesium.CallbackProperty(function () {
+                            const distance = Cesium.Cartesian3.distance(activePoints[0], currentMousePosition);
+                            return distance.toFixed(2) + 'm';
+                        }, false),
+                        font: '16px sans-serif',
+                        fillColor: Cesium.Color.WHITE,
+                        outlineColor: Cesium.Color.BLACK,
+                        outlineWidth: 2,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+                    }
+                });
+            }
+
         }
     }
 }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
@@ -95,6 +123,11 @@ function ApagarMedicao() {
     if (previewLine) {
         viewer.entities.remove(previewLine);
         previewLine = null;
+    }
+    // Remover etiqueta de pré-visualização
+    if (previewLabel) {
+        viewer.entities.remove(previewLabel);
+        previewLabel = null;
     }
     currentMousePosition = null;
 
