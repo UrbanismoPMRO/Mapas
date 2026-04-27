@@ -111,7 +111,7 @@ document.getElementById('boxAlturaEdif').addEventListener('change', (event) => {
 });
 
 document.getElementById('btn3D').addEventListener('click', () => {
-viewer.projectionPicker.viewModel.switchToPerspective();
+  viewer.projectionPicker.viewModel.switchToPerspective();
 });
 
 document.getElementById('btn2D').addEventListener('click', () => {
@@ -123,27 +123,15 @@ document.getElementById('btnVistaSuperior').addEventListener('click', () => {
 });
 
 document.getElementById('btnMedir').addEventListener('click', () => {
-Medir();
+  Medir();
 });
 
 document.getElementById('btnMedirApagar').addEventListener('click', () => {
-ApagarMedicao();
+  ApagarMedicao();
 });
 
 document.getElementById('btnDesligarMedir').addEventListener('click', () => {
-DesligarMedir();
-  /*  if (evento == false) {
-    selTeste();
-    evento = true;
-    console.log(evento);
-    //break;
-  } else {
-  if (evento == true) {
-    selTeste();
-    evento = false;
-    console.log(evento);
-  }
-}*/
+  DesligarMedir();
 });
 
 document.getElementById('btnTeste').addEventListener('click', () => {
@@ -153,12 +141,12 @@ document.getElementById('btnTeste').addEventListener('click', () => {
     console.log(evento);
     //break;
   } else {
-  if (evento == true) {
-    selTeste();
-    evento = false;
-    console.log(evento);
+    if (evento == true) {
+      selTeste();
+      evento = false;
+      console.log(evento);
+    }
   }
-}
 });
 
 
@@ -182,31 +170,135 @@ document.getElementById('btnCarregaArquivo').addEventListener('click', () => {
 
 document.getElementById('inputArquivo').addEventListener('change', (event) => {
   const arquivo = event.target.files[0];
-  
+
   if (arquivo) {
-    const leitor = new FileReader();
-    leitor.onload = function(e) {
-      const conteudo = e.target.result;
-      
-      // Converter string para objeto JSON
-      const dados = JSON.parse(conteudo);
-      
-      // Carregar no Cesium
-      Cesium.GeoJsonDataSource.load(dados, {
-        stroke: Cesium.Color.YELLOW,
-        fill: Cesium.Color.YELLOW.withAlpha(0.5),
-        strokeWidth: 2,
-        clampToGround: true
-      }).then(function(dataSource) {
-        viewer.dataSources.add(dataSource);
-        viewer.zoomTo(dataSource);
-        console.log('Arquivo carregado com sucesso!');
-      }).catch(function(erro) {
-        alert('Erro ao carregar arquivo: ' + erro);
-      });
-    };
-    leitor.readAsText(arquivo);
+    const extensao = arquivo.name.toLowerCase().split('.').pop();
+
+    if (extensao === 'kml') {
+      // Carregar arquivo KML
+      const leitor = new FileReader();
+      leitor.onload = function (e) {
+        const conteudo = e.target.result;
+        const blob = new Blob([conteudo], { type: 'application/vnd.google-earth.kml+xml' });
+        const url = URL.createObjectURL(blob);
+
+        Cesium.KmlDataSource.load(url, {
+          camera: viewer.camera,
+          canvas: viewer.canvas,
+          clampToGround: true
+        }).then(function (dataSource) {
+          viewer.dataSources.add(dataSource);
+          viewer.zoomTo(dataSource);
+          console.log('Arquivo KML carregado com sucesso!');
+
+          const entities = dataSource.entities.values;
+          for (let i = 0; i < entities.length; i++) {
+            const entity = entities[i];
+            if (entity.polygon) {
+              entity.polygon.outline = true;
+              entity.polygon.outlineColor = Cesium.Color.BLACK;
+              //entity.polygon.material = Cesium.Color.BLUE;
+              entity.polygon.shadows = Cesium.ShadowMode.ENABLED;
+              switch (i) {
+                case 0:
+                  entity.polygon.material = Cesium.Color.BLUE; // Cor preenchimento
+                  break;
+                case 1:
+                  entity.polygon.material = Cesium.Color.RED; // Cor preenchimento
+                  break;
+                case 2:
+                  entity.polygon.material = Cesium.Color.GREEN; // Cor preenchimento
+                  break;
+                case 3:
+                  entity.polygon.material = Cesium.Color.ORANGE; // Cor preenchimento
+                  break;
+                case 4:
+                  entity.polygon.material = Cesium.Color.WHITE; // Cor preenchimento
+                  break;
+                case 5:
+                  entity.polygon.material = Cesium.Color.BLACK; // Cor preenchimento
+                  break;
+                default:
+                  entity.polygon.material = Cesium.Color.YELLOW; // Cor preenchimento
+              }
+            }
+            if (entity.polyline) {
+              entity.polyline.width = 2;
+              entity.polyline.clampToGround = true;
+              alert("A geometria carregada não é um polígono, assim não poderá ser extrudada. Apenas polígonos podem ser extrudados, ou seja, elevados a uma altura específica. Linhas e pontos não possuem área para serem extrudados, por isso não terão essa funcionalidade disponível.");
+
+            }
+          }
+        }).catch(function (erro) {
+          alert('Erro ao carregar arquivo KML: ' + erro);
+        });
+      };
+      leitor.readAsText(arquivo);
+
+    } else if (extensao === 'geojson' || extensao === 'json') {
+      // Carregar arquivo GeoJSON
+      const leitor = new FileReader();
+      leitor.onload = function (e) {
+        const conteudo = e.target.result;
+
+        // Converter string para objeto JSON
+        const dados = JSON.parse(conteudo);
+
+        // Carregar no Cesium
+        Cesium.GeoJsonDataSource.load(dados, {
+          stroke: Cesium.Color.YELLOW,
+          fill: Cesium.Color.YELLOW,
+          strokeWidth: 2,
+          clampToGround: true,
+          shadows: true
+        }).then(function (dataSource) {
+          viewer.dataSources.add(dataSource);
+          viewer.zoomTo(dataSource);
+          console.log('Arquivo GeoJSON carregado com sucesso!');
+          const entities = dataSource.entities.values;
+          //dá cor única para cada bloco da edificação
+          for (let i = 0; i < entities.length; i++) {
+            const entity = entities[i];
+            if (entity.polygon) {
+              entity.polygon.outline = true;
+              entity.polygon.outlineColor = Cesium.Color.BLACK;
+              entity.polygon.shadows = Cesium.ShadowMode.ENABLED;
+              switch (i) {
+                case 0:
+                  entity.polygon.material = Cesium.Color.BLUE; // Cor preenchimento
+                  break;
+                case 1:
+                  entity.polygon.material = Cesium.Color.RED; // Cor preenchimento
+                  break;
+                case 2:
+                  entity.polygon.material = Cesium.Color.GREEN; // Cor preenchimento
+                  break;
+                case 3:
+                  entity.polygon.material = Cesium.Color.ORANGE; // Cor preenchimento
+                  break;
+                case 4:
+                  entity.polygon.material = Cesium.Color.WHITE; // Cor preenchimento
+                  break;
+                case 5:
+                  entity.polygon.material = Cesium.Color.BLACK; // Cor preenchimento
+                  break;
+                default:
+                  entity.polygon.material = Cesium.Color.YELLOW; // Cor preenchimento
+              }
+            }
+            if (entity.polyline) {
+              entity.polyline.width = 2;
+              entity.polyline.clampToGround = true;
+              alert("A geometria carregada não é um polígono, assim não poderá ser extrudada. Apenas polígonos podem ser extrudados, ou seja, elevados a uma altura específica. Linhas e pontos não possuem área para serem extrudados, por isso não terão essa funcionalidade disponível.");
+            }
+          }
+        }).catch(function (erro) {
+          alert('Erro ao carregar arquivo GeoJSON: ' + erro);
+        });
+      };
+      leitor.readAsText(arquivo);
+    } else {
+      alert('Formato de arquivo não suportado. Use .kml ou .geojson');
+    }
   }
 });
-
-
