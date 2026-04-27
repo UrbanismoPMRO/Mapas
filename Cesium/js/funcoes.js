@@ -1,3 +1,6 @@
+import { varPontoSelecionado } from "./config.js";
+import { CotaSoleiraAtual, pickedObject } from "./index.js";
+
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
 const viewer = new Cesium.Viewer('cesiumContainer', {
     projectionPicker: true,
@@ -33,9 +36,9 @@ function carregarLimite() {
 
 function carregaEdificio(ArquivoCarregado) {
     const VarEdificio = Cesium.GeoJsonDataSource.load('https://urbanismopmro.github.io/Mapas/Cesium/Geometrias/Edificio_BlocoDuplo.geojson', {
-         clampToGround: true 
-        }); //orignial, antes de abrir arquivo pela janela de carregamento de arquivos
-    
+        clampToGround: true
+    }); //orignial, antes de abrir arquivo pela janela de carregamento de arquivos
+
 
     VarEdificio.then(function (dataSource) {
         viewer.dataSources.add(dataSource);
@@ -96,9 +99,69 @@ function carregaLoteamento() {
     });
 }
 
+//tstes para inserir modelo 3d
+function carregarModelo3D() {
+    const position = Cesium.Cartesian3.fromDegrees(
+        varPontoSelecionado.varLongitude, // Longitude
+        varPontoSelecionado.varLatitude, // Latitude
+        varPontoSelecionado.varAltura        // Altitude em metros
+    );
+    const entity = viewer.entities.add({
+        position: position,
+        model: {
+            uri: 'https://urbanismopmro.github.io/Mapas/Cesium/Geometrias/Prisma1.glb',
+            scale: 1.0, // Ajuste a escala se necessário
+            //        minimumPixelSize: 64 // Tamanho mínimo na tela
+        }
+    });
+    viewer.zoomTo(entity);
+}
+
+function AlturaSoleira() {
+    // Função para alterar a altura de TODOS os polígonos
+    let totalPoligonosAlterados = 0;
+        const CotaSoleira = parseFloat(document.getElementById("boxCotaSoleira").value); //pega o valor da cota de soleira no formulário
+    // Iterar sobre todos os dataSources
+    for (let i = 0; i < viewer.dataSources.length; i++) {
+        const dataSource = viewer.dataSources.get(i);
+        const entities = dataSource.entities.values;
+        // Iterar sobre todas as entidades do dataSource
+        for (let j = 0; j < entities.length; j++) {
+            const entity = entities[j];
+            // Verificar se a entidade tem polígono
+            if (entity.polygon) {
+                const AlturaAtual = entity.polygon.extrudedHeight || 0; // Obtém a altura atual (ou 0 se não estiver definida)
+                const AlturaAtualSemSoleira = AlturaAtual - CotaSoleiraAtual; // Calcula a altura atual sem a cota de soleira
+                const AlturaFinal = CotaSoleira + AlturaAtualSemSoleira; // Calcula a nova altura somando a cota de soleira com a altura atual do edifício   
+                entity.polygon.extrudedHeight = AlturaFinal;
+                totalPoligonosAlterados++;
+                console.log(AlturaFinal);
+            }
+        }
+    }
+}
+
+function AlturaEdificacao() {
+    const opcaoSelecionada = event.target.value;
+    if (Cesium.defined(pickedObject) && pickedObject.id instanceof Cesium.Entity) {
+        const entity = pickedObject.id;
+
+        // --- AQUI ALTERAMOS A PROPRIEDADE APENAS DESTE POLÍGONO ---
+        const CotaSoleira = parseFloat(document.getElementById("boxCotaSoleira").value); //pega o valor da cota de soleira no formulário
+        const ConstAltura = parseFloat(document.getElementById("boxAlturaEdif").value); //pega o valor da altura no formulário
+        const AlturaFinal = CotaSoleira + ConstAltura; //calcula a altura final somando a cota de soleira com a altura do edifício
+        entity.polygon.extrudedHeight = AlturaFinal; //aplica a altura final na extrusão do polígono
+    }
+    //const entities = dataSource.entities.values;
+    //for (let i = 0; i < entities.length; i++) {
+    //    const entity = entities[i];
+    //}
+}
+
+
 
 function exibirAlerta() {
     alert("Pare!");
 }
 
-export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento };
+export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira };

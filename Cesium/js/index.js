@@ -1,5 +1,5 @@
-import { TokenCesium } from './config.js';
-import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta } from './funcoes.js';
+import { TokenCesium, varPontoSelecionado } from './config.js';
+import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta, carregarModelo3D, AlturaEdificacao, AlturaSoleira} from './funcoes.js';
 import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
 import { Medir, ApagarMedicao, DesligarMedir } from './Medir.js'
 // Your access token can be found at: https://ion.cesium.com/tokens.
@@ -32,11 +32,9 @@ viewer.camera.flyTo(LocalAlvo);
 let handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 let pickedObject;
 let mousePosition;
-let varLongitude = -41.932416;
-let varLatitude = -22.479147;
-let varAltura = 300;
 let varCartesiano;
 let varCartografico;
+let CotaSoleiraAtual = 0; //armazena a cota da soleira depois de ser alterada, para que a função de alterar a cota de soleira possa usar esse valor atualizado para calcular a nova altura do edifício, caso o usuário queira alterar a cota de soleira mais de uma vez.
 
 handler.setInputAction(function (click) {
   // 4. Selecionar o objeto clicado
@@ -52,10 +50,10 @@ handler.setInputAction(function (click) {
       // 6. Converter de ECEF para Cartográfico (Latitude/Longitude em Radianos)
       varCartografico = Cesium.Cartographic.fromCartesian(varCartesiano);
       // 7. Converter Radianos para Graus
-      varLongitude = Cesium.Math.toDegrees(varCartografico.longitude);
-      varLatitude = Cesium.Math.toDegrees(varCartografico.latitude);
-      varAltura = viewer.scene.globe.getHeight(varCartografico); // Opcional: altura do terreno
-      console.log(`Longitude: ${varLongitude}, Latitude: ${varLatitude}, Altura: ${varAltura}`);
+      varPontoSelecionado.varLongitude = Cesium.Math.toDegrees(varCartografico.longitude);
+      varPontoSelecionado.varLatitude = Cesium.Math.toDegrees(varCartografico.latitude);
+      varPontoSelecionado.varAltura = viewer.scene.globe.getHeight(varCartografico); // Opcional: altura do terreno
+      console.log(`Longitude: ${varPontoSelecionado.varLongitude}, Latitude: ${varPontoSelecionado.varLatitude}, Altura: ${varPontoSelecionado.varAltura}`);
     }
   }
   ////fim enxerto
@@ -96,18 +94,11 @@ document.getElementById('sliderMarcoAstronomico').addEventListener('change', (ev
 
 //Atribui Extrusão de acrodo com o valor da caixa de texto
 document.getElementById('boxAlturaEdif').addEventListener('change', (event) => {
-  const opcaoSelecionada = event.target.value;
-  if (Cesium.defined(pickedObject) && pickedObject.id instanceof Cesium.Entity) {
-    const entity = pickedObject.id;
-
-    // --- AQUI ALTERAMOS A PROPRIEDADE APENAS DESTE POLÍGONO ---
-    const ConstAltura = parseFloat(document.getElementById("boxAlturaEdif").value); //pega o valor da altura no formulário
-    //const entities = dataSource.entities.values;
-    //for (let i = 0; i < entities.length; i++) {
-    //    const entity = entities[i];
-    entity.polygon.extrudedHeight = ConstAltura;
-    //}
-  }
+  AlturaEdificacao();
+});
+document.getElementById('boxCotaSoleira').addEventListener('change', (event) => {
+  AlturaSoleira();
+  CotaSoleiraAtual = parseFloat(document.getElementById('boxCotaSoleira').value);
 });
 
 document.getElementById('btn3D').addEventListener('click', () => {
@@ -135,18 +126,7 @@ document.getElementById('btnDesligarMedir').addEventListener('click', () => {
 });
 
 document.getElementById('btnTeste').addEventListener('click', () => {
-  if (evento == false) {
-    selTeste();
-    evento = true;
-    console.log(evento);
-    //break;
-  } else {
-    if (evento == true) {
-      selTeste();
-      evento = false;
-      console.log(evento);
-    }
-  }
+carregarModelo3D();
 });
 
 
@@ -302,3 +282,5 @@ document.getElementById('inputArquivo').addEventListener('change', (event) => {
     }
   }
 });
+
+export {pickedObject, CotaSoleiraAtual};
