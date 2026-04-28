@@ -1,5 +1,5 @@
 import { TokenCesium, varPontoSelecionado } from './config.js';
-import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta, carregarModelo3D, AlturaEdificacao, AlturaSoleira} from './funcoes.js';
+import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d } from './funcoes.js';
 import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
 import { Medir, ApagarMedicao, DesligarMedir } from './Medir.js'
 // Your access token can be found at: https://ion.cesium.com/tokens.
@@ -20,6 +20,8 @@ viewer.terrainShadows = Cesium.ShadowMode.ENABLED;
 viewer.timeline.currentTime = new Cesium.JulianDate(2461397.2083333335)
 viewer.timeline.updateFromClock();
 viewer.scene.globe.depthTestAgainstTerrain = true; //desativa teste de profundidade para que o aplicativo não verifique o solo, isso serve para que a linha de limite não fique sob o solo.
+
+//Carrega  o modelo de terreno do Cesium Ion e o openstreemap como alternativas para visualização
 
 
 // Initialize the Cesium Viewer in the HTML element with the ID `cesiumContainer`    // Fly the camera to San Francisco at the given longitude, latitude, and height.
@@ -102,15 +104,13 @@ document.getElementById('boxCotaSoleira').addEventListener('change', (event) => 
 });
 
 document.getElementById('btn3D').addEventListener('click', () => {
-  viewer.projectionPicker.viewModel.switchToPerspective();
-});
-
-document.getElementById('btn2D').addEventListener('click', () => {
-  viewer.projectionPicker.viewModel.switchToOrthographic();
+  Vista3d();
+  toggleMap();
 });
 
 document.getElementById('btnVistaSuperior').addEventListener('click', () => {
   VistaSuperior();
+  toggleMap();
 });
 
 document.getElementById('btnMedir').addEventListener('click', () => {
@@ -125,22 +125,17 @@ document.getElementById('btnDesligarMedir').addEventListener('click', () => {
   DesligarMedir();
 });
 
+document.getElementById('btnCarregarModelo3D').addEventListener('click', () => {
+  carregarModelo3D();
+});
+
 document.getElementById('btnTeste').addEventListener('click', () => {
-carregarModelo3D();
+  //carregaRotulo();
+  toggleMap();
 });
 
 
-function VistaSuperior() {
-  const NovoAlvo = {
-    destination: Cesium.Cartesian3.fromDegrees(varLongitude, varLatitude, 300),
-    orientation: {
-      heading: Cesium.Math.toRadians(0.0),
-      pitch: Cesium.Math.toRadians(-90.0),
-    }
-  }
-  viewer.camera.flyTo(NovoAlvo);
-  viewer.projectionPicker.viewModel.switchToOrthographic();
-};
+
 
 
 //carregar arquivo
@@ -283,4 +278,4 @@ document.getElementById('inputArquivo').addEventListener('change', (event) => {
   }
 });
 
-export {pickedObject, CotaSoleiraAtual};
+export { pickedObject, CotaSoleiraAtual };

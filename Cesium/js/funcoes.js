@@ -9,6 +9,23 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     terrainShadows: Cesium.ShadowMode.ENABLED // Habilita sombras no terreno
 });
 
+//inicializa a base OSM para visualização alternativa
+// 1. Adicionar OSM inicialmente oculto
+const osmLayer = viewer.imageryLayers.addImageryProvider(
+  new Cesium.OpenStreetMapImageryProvider({
+    url: 'https://tile.openstreetmap.org/',
+  })
+);
+osmLayer.show = false;
+
+//função de alternância entre mpas de Satelite Cesium e OSM
+function toggleMap() {
+  const baseLayer = viewer.imageryLayers.get(0);
+  baseLayer.show = !baseLayer.show; // Inverte base
+  osmLayer.show = !baseLayer.show;  // Inverte OSM
+}
+
+//Determina o local de visualização inicial da câmera
 const LocalAlvo = {
     destination: Cesium.Cartesian3.fromDegrees(-41.934365, -22.554048, 1400),
     orientation: {
@@ -34,6 +51,30 @@ function carregarLimite() {
     });
 }
 
+function VistaSuperior() {
+  const NovoAlvo = {
+    destination: Cesium.Cartesian3.fromDegrees(varPontoSelecionado.varLongitude, varPontoSelecionado.varLatitude, 300),
+    orientation: {
+      heading: Cesium.Math.toRadians(0.0),
+      pitch: Cesium.Math.toRadians(-90.0),
+    }
+  }
+  viewer.camera.flyTo(NovoAlvo);
+  viewer.projectionPicker.viewModel.switchToOrthographic();
+};
+
+function Vista3d() {
+  const NovoAlvo = {
+    destination: Cesium.Cartesian3.fromDegrees(varPontoSelecionado.varLongitude, varPontoSelecionado.varLatitude, 300),
+    orientation: {
+      heading: Cesium.Math.toRadians(0.0),
+      pitch: Cesium.Math.toRadians(-15.0),
+    }
+  }
+  viewer.camera.flyTo(NovoAlvo);
+  viewer.projectionPicker.viewModel.switchToPerspective();
+};
+
 function carregaEdificio(ArquivoCarregado) {
     const VarEdificio = Cesium.GeoJsonDataSource.load('https://urbanismopmro.github.io/Mapas/Cesium/Geometrias/Edificio_BlocoDuplo.geojson', {
         clampToGround: true
@@ -48,6 +89,17 @@ function carregaEdificio(ArquivoCarregado) {
         const entities = dataSource.entities.values;
         for (let i = 0; i < entities.length; i++) {
             const entity = entities[i];
+
+            const name = 'Daniel';
+            entity.label = {
+                text: name,
+                font: '14px sans-serif',
+                showBackground: true,
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 5000000), // Oculta zoom alto
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -9)
+            };
+
             switch (i) {
                 case 0:
                     entity.polygon.material = Cesium.Color.BLUE.withAlpha(1.0); // Cor preenchimento
@@ -120,7 +172,7 @@ function carregarModelo3D() {
 function AlturaSoleira() {
     // Função para alterar a altura de TODOS os polígonos
     let totalPoligonosAlterados = 0;
-        const CotaSoleira = parseFloat(document.getElementById("boxCotaSoleira").value); //pega o valor da cota de soleira no formulário
+    const CotaSoleira = parseFloat(document.getElementById("boxCotaSoleira").value); //pega o valor da cota de soleira no formulário
     // Iterar sobre todos os dataSources
     for (let i = 0; i < viewer.dataSources.length; i++) {
         const dataSource = viewer.dataSources.get(i);
@@ -158,10 +210,65 @@ function AlturaEdificacao() {
     //}
 }
 
+function carregaRotulo() {
+    const VarEdificio = Cesium.GeoJsonDataSource.load('https://urbanismopmro.github.io/Mapas/Cesium/Geometrias/Edificio_BlocoDuplo.geojson', {
+        clampToGround: true
+    }); //orignial, antes de abrir arquivo pela janela de carregamento de arquivos
 
+
+    VarEdificio.then(function (dataSource) {
+        viewer.dataSources.add(dataSource);
+        // Zoom para o polígono
+        viewer.zoomTo(dataSource);
+        const ConstAltura = parseFloat(document.getElementById("boxAlturaEdif").value); //pega o valor da altura no formulário
+        const entities = dataSource.entities.values;
+        for (let i = 0; i < entities.length; i++) {
+            const entity = entities[i];
+
+            const name = 'Daniel';
+            entity.label = {
+                text: name,
+                font: '14px sans-serif',
+                showBackground: true,
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 5000000), // Oculta zoom alto
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -9)
+            };
+
+            switch (i) {
+                case 0:
+                    entity.polygon.material = Cesium.Color.BLUE.withAlpha(1.0); // Cor preenchimento
+                    break;
+                case 1:
+                    entity.polygon.material = Cesium.Color.RED.withAlpha(1.0); // Cor preenchimento
+                    break;
+                case 2:
+                    entity.polygon.material = Cesium.Color.GREEN.withAlpha(1.0); // Cor preenchimento
+                    break;
+                case 3:
+                    entity.polygon.material = Cesium.Color.ORANGE.withAlpha(1.0); // Cor preenchimento
+                    break;
+                case 4:
+                    entity.polygon.material = Cesium.Color.WHITE.withAlpha(1.0); // Cor preenchimento
+                    break;
+                case 5:
+                    entity.polygon.material = Cesium.Color.BLACK.withAlpha(1.0); // Cor preenchimento
+                    break;
+                default:
+                    entity.polygon.material = Cesium.Color.YELLOW.withAlpha(1.0); // Cor preenchimento
+            }
+            //entity.polygon.extrudedHeight = ConstAltura;
+            //entity.polygon.outline = true;
+            //entity.polygon.outlineColor = Cesium.Color.BLACK;
+            //entity.polygon.extrudedHeightReference = Cesium.HeightReference.RELATIVE_TO_GROUND; //considera o solo como nivel para a extrusão (altural)
+            entity.polygon.shadows = Cesium.ShadowMode.ENABLED;
+        }
+    });
+
+}
 
 function exibirAlerta() {
     alert("Pare!");
 }
 
-export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira };
+export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d };

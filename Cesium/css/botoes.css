@@ -1,28 +1,4 @@
-#btn3D {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 999;
-}
-#btn2D {
-    position: absolute;
-    top: 10px;
-    left: 80px;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 999;
-}
-#btnCarregaEdificacao {
+#btnVistaSuperior {
     position: absolute;
     top: 60px;
     left: 10px;
@@ -35,9 +11,22 @@
     z-index: 999;
 }
 
-#btnVistaSuperior {
+#btn3D {
     position: absolute;
-    top: 110px;
+    top: 60px;
+    left: 145px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+#btnCarregaEdificacao {
+    position: absolute;
+    top: 10px;
     left: 10px;
     padding: 10px 20px;
     background-color: #007bff;
@@ -47,9 +36,25 @@
     cursor: pointer;
     z-index: 999;
 }
+
+#btnCarregaArquivo {
+    position: absolute;
+    top: 10px;
+    left: 180px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+
+
 #btnMedir {
     position: absolute;
-    top: 300px;
+    top: 360px;
     left: 10px;
     padding: 10px 20px;
     background-color: #007bff;
@@ -59,9 +64,10 @@
     cursor: pointer;
     z-index: 999;
 }
+
 #btnDesligarMedir {
     position: absolute;
-    top: 300px;
+    top: 360px;
     left: 100px;
     padding: 10px 20px;
     background-color: #007bff;
@@ -71,9 +77,10 @@
     cursor: pointer;
     z-index: 999;
 }
+
 #btnMedirApagar {
     position: absolute;
-    top: 300px;
+    top: 360px;
     left: 190px;
     padding: 10px 20px;
     background-color: #007bff;
@@ -83,7 +90,21 @@
     cursor: pointer;
     z-index: 999;
 }
+
 #btnTeste {
+    position: absolute;
+    top: 600px;
+    left: 190px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+#btnCarregarModelo3D {
     position: absolute;
     top: 600px;
     left: 10px;
@@ -95,11 +116,31 @@
     cursor: pointer;
     z-index: 999;
 }
-#btnCarregaArquivo {
+
+
+
+#boxCotaSoleira {
     position: absolute;
-    top: 110px;
-    left: 160px;
-    padding: 10px 20px;
+    /* top: 110px; */
+    /* left: 160px; */
+    width: 80px;
+    height: 20px;
+    padding: 5px 5px;
+    background-color: #e9cc4d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+#boxAlturaEdif {
+    position: absolute;
+    /* top: 80px; */
+    /* left: 160px; */
+    width: 80px;
+    height: 20px;
+    padding: 5px 5px;
     background-color: #e9cc4d;
     color: white;
     border: none;
@@ -109,6 +150,27 @@
 }
 
 
+#labelMarco {
+    /* position: absolute; */
+    /* top: 80px; */
+    /* left: 160px; */
+    /* width: 80px; */
+    /* height: 20px; */
+    /* padding: 5px 5px; */
+    /* background-color: #e9cc4d; */
+    /* color: white; */
+    /* border: none; */
+    /* border-radius: 5px; */
+    /* cursor: pointer; */
+    /* z-index: 999; */
+    font-size: 14px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    color: #ffd82d;
+    background-color: #6aa0f1;
+    border-radius: 5px;
+    padding: 5px 5px;
+}
 
 #frmControles {
     position: absolute;
@@ -121,7 +183,7 @@
     z-index: 30;
     font-family: 'Courier New', Courier, monospace;
     font-size: 14px;
-    width:fit-content;
+    width: fit-content;
 }
 
 #frmTeste {
@@ -135,5 +197,5 @@
     z-index: 30;
     font-family: 'Courier New', Courier, monospace;
     font-size: 14px;
-    width:fit-content;
+    width: fit-content;
 }

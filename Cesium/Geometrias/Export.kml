@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+<name>Nom du document</name>
+<open>1</open>
+<Style id="Mon_Style_1">
+	<IconStyle>
+		<color>ff7fffff</color>
+		<scale>1.2</scale>
+		<Icon>
+		<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+		</Icon>
+	</IconStyle>
+	<LabelStyle>
+		<color></color>
+		<scale>0</scale>
+	</LabelStyle>
+	<LineStyle>
+		<color>ff0000ff</color>
+		<width>2</width>
+	</LineStyle>
+	<PolyStyle>
+		<color>5400aa00</color>
+	</PolyStyle>
+</Style>
+<Placemark>
+	<name>Polygon</name>
+	<styleUrl>#Mon_Style_1</styleUrl>
+	<Polygon>
+		<outerBoundaryIs>
+		<LinearRing>
+		<coordinates>
+199980.14255451367,7507298.8,0
+199980.0573862825,7507299.392358059,0
+199979.8087814126,7507299.936726791,0
+199979.416880392,7507300.389004678,0
+199978.91343271063,7507300.712550857,0
+199978.3392247056,7507300.88115354,0
+199977.74077529443,7507300.88115354,0
+199977.1665672894,7507300.712550857,0
+199976.663119608,7507300.389004678,0
+199976.2712185874,7507299.936726791,0
+199976.0226137175,7507299.392358059,0
+199975.93744548634,7507298.8,0
+199976.0226137175,7507298.207641941,0
+199976.2712185874,7507297.663273209,0
+199976.663119608,7507297.210995321,0
+199977.1665672894,7507296.8874491425,0
+199977.74077529443,7507296.71884646,0
+199978.3392247056,7507296.71884646,0
+199978.91343271063,7507296.8874491425,0
+199979.416880392,7507297.210995321,0
+199979.8087814126,7507297.663273209,0
+199980.0573862825,7507298.207641941,0
+199980.14255451367,7507298.8,0
+		</coordinates>
+		</LinearRing>
+		</outerBoundaryIs>   
+	</Polygon>
+</Placemark>
+<Placemark>
+	<name>Polygon</name>
+	<styleUrl>#Mon_Style_1</styleUrl>
+	<Polygon>
+		<outerBoundaryIs>
+		<LinearRing>
+		<coordinates>
+199978.04,7507298.8,0
+200008.04,7507298.8,0
+200008.04,7507328.8,0
+199978.04,7507328.8,0
+199978.04,7507298.8,0
+		</coordinates>
+		</LinearRing>
+		</outerBoundaryIs>   
+	</Polygon>
+</Placemark>
+</Document>
+</kml>
