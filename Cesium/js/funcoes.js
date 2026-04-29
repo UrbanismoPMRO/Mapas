@@ -12,17 +12,17 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
 //inicializa a base OSM para visualização alternativa
 // 1. Adicionar OSM inicialmente oculto
 const osmLayer = viewer.imageryLayers.addImageryProvider(
-  new Cesium.OpenStreetMapImageryProvider({
-    url: 'https://tile.openstreetmap.org/',
-  })
+    new Cesium.OpenStreetMapImageryProvider({
+        url: 'https://tile.openstreetmap.org/',
+    })
 );
 osmLayer.show = false;
 
 //função de alternância entre mpas de Satelite Cesium e OSM
 function toggleMap() {
-  const baseLayer = viewer.imageryLayers.get(0);
-  baseLayer.show = !baseLayer.show; // Inverte base
-  osmLayer.show = !baseLayer.show;  // Inverte OSM
+    const baseLayer = viewer.imageryLayers.get(0);
+    baseLayer.show = !baseLayer.show; // Inverte base
+    osmLayer.show = !baseLayer.show;  // Inverte OSM
 }
 
 //Determina o local de visualização inicial da câmera
@@ -52,28 +52,55 @@ function carregarLimite() {
 }
 
 function VistaSuperior() {
-  const NovoAlvo = {
-    destination: Cesium.Cartesian3.fromDegrees(varPontoSelecionado.varLongitude, varPontoSelecionado.varLatitude, 300),
-    orientation: {
-      heading: Cesium.Math.toRadians(0.0),
-      pitch: Cesium.Math.toRadians(-90.0),
+    const NovoAlvo = {
+        destination: Cesium.Cartesian3.fromDegrees(varPontoSelecionado.varLongitude, varPontoSelecionado.varLatitude, 300),
+        orientation: {
+            heading: Cesium.Math.toRadians(0.0),
+            pitch: Cesium.Math.toRadians(-90.0),
+        }
     }
-  }
-  viewer.camera.flyTo(NovoAlvo);
-  viewer.projectionPicker.viewModel.switchToOrthographic();
+    viewer.camera.flyTo(NovoAlvo);
+    viewer.projectionPicker.viewModel.switchToOrthographic();
 };
 
 function Vista3d() {
-  const NovoAlvo = {
-    destination: Cesium.Cartesian3.fromDegrees(varPontoSelecionado.varLongitude, varPontoSelecionado.varLatitude, 300),
-    orientation: {
-      heading: Cesium.Math.toRadians(0.0),
-      pitch: Cesium.Math.toRadians(-15.0),
+    const NovoAlvo = {
+        destination: Cesium.Cartesian3.fromDegrees(varPontoSelecionado.varLongitude, varPontoSelecionado.varLatitude, 300),
+        orientation: {
+            heading: Cesium.Math.toRadians(0.0),
+            pitch: Cesium.Math.toRadians(-15.0),
+        }
     }
-  }
-  viewer.camera.flyTo(NovoAlvo);
-  viewer.projectionPicker.viewModel.switchToPerspective();
+    viewer.camera.flyTo(NovoAlvo);
+    viewer.projectionPicker.viewModel.switchToPerspective();
 };
+
+async function baixarPoligono(viewer, filename = 'Edificio_BlocoDuplo.kml') {
+    try {
+        // 1. Exporta as entidades para uma string XML/KML
+        const result = await Cesium.exportKml({
+            entities: viewer.entities,
+        });
+
+        // 2. Cria um Blob com o conteúdo XML
+        const blob = new Blob([result.kml], { type: 'application/vnd.google-earth.kml+xml' });
+
+        // 3. Cria um link temporário no DOM para disparar o download
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+
+        // 4. Simula o clique e limpa o elemento
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log("Download do KML iniciado com sucesso.");
+    } catch (error) {
+        console.error("Erro ao exportar KML:", error);
+    }
+}
+
 
 function carregaEdificio(ArquivoCarregado) {
     const VarEdificio = Cesium.GeoJsonDataSource.load('https://urbanismopmro.github.io/Mapas/Cesium/Geometrias/Edificio_BlocoDuplo.geojson', {
@@ -180,15 +207,33 @@ function AlturaSoleira() {
         // Iterar sobre todas as entidades do dataSource
         for (let j = 0; j < entities.length; j++) {
             const entity = entities[j];
-            // Verificar se a entidade tem polígono
             if (entity.polygon) {
+                var AlturaAtualSemSoleira = 0;
                 const AlturaAtual = entity.polygon.extrudedHeight || 0; // Obtém a altura atual (ou 0 se não estiver definida)
-                const AlturaAtualSemSoleira = AlturaAtual - CotaSoleiraAtual; // Calcula a altura atual sem a cota de soleira
+                if ((AlturaAtual - CotaSoleiraAtual) <= 0) {
+                    AlturaAtualSemSoleira = 0;
+                    console.log('<=0');
+                } else {
+                    AlturaAtualSemSoleira = AlturaAtual - CotaSoleiraAtual; // Calcula a altura atual sem a cota de soleira
+                    console.log('>0');
+                }
                 const AlturaFinal = CotaSoleira + AlturaAtualSemSoleira; // Calcula a nova altura somando a cota de soleira com a altura atual do edifício   
                 entity.polygon.extrudedHeight = AlturaFinal;
                 totalPoligonosAlterados++;
-                console.log(AlturaFinal);
+                console.log('altura final: ' + AlturaFinal);
             }
+
+            // if (entity.polygon) {
+            //     const AlturaAtual = entity.polygon.extrudedHeight || 0; // Obtém a altura atual (ou 0 se não estiver definida)
+            //     const AlturaAtualSemSoleira = AlturaAtual - CotaSoleiraAtual; // Calcula a altura atual sem a cota de soleira
+            //     const AlturaFinal = CotaSoleira + AlturaAtualSemSoleira; // Calcula a nova altura somando a cota de soleira com a altura atual do edifício   
+            //     entity.polygon.extrudedHeight = AlturaFinal;
+            //     totalPoligonosAlterados++;
+            //     console.log('altura final: ' + AlturaFinal);
+            // }
+
+
+            console.log('Total de polígonos alterados: ' + totalPoligonosAlterados);
         }
     }
 }
@@ -271,4 +316,4 @@ function exibirAlerta() {
     alert("Pare!");
 }
 
-export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d };
+export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono };

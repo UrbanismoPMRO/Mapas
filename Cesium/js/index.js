@@ -1,5 +1,5 @@
 import { TokenCesium, varPontoSelecionado } from './config.js';
-import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d } from './funcoes.js';
+import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono } from './funcoes.js';
 import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
 import { Medir, ApagarMedicao, DesligarMedir } from './Medir.js'
 // Your access token can be found at: https://ion.cesium.com/tokens.
@@ -38,6 +38,7 @@ let varCartesiano;
 let varCartografico;
 let CotaSoleiraAtual = 0; //armazena a cota da soleira depois de ser alterada, para que a função de alterar a cota de soleira possa usar esse valor atualizado para calcular a nova altura do edifício, caso o usuário queira alterar a cota de soleira mais de uma vez.
 
+// 4. Capturar a posição do clique (2D - pixeis)
 handler.setInputAction(function (click) {
   // 4. Selecionar o objeto clicado
   pickedObject = viewer.scene.pick(click.position);
@@ -58,8 +59,71 @@ handler.setInputAction(function (click) {
       console.log(`Longitude: ${varPontoSelecionado.varLongitude}, Latitude: ${varPontoSelecionado.varLatitude}, Altura: ${varPontoSelecionado.varAltura}`);
     }
   }
+  //enxerto para pegar altura do objeto clicado
+  if (Cesium.defined(pickedObject) && pickedObject.id instanceof Cesium.Entity) {
+    var entity = pickedObject.id;
+    console.log("Entidade selecionada:", entity.name);
+    var input = document.getElementById("boxAlturaEdif");
+    var alturaAtual = (entity.polygon.extrudedHeight || 0) - CotaSoleiraAtual; // Obtém a altura atual do edifício (ou 0 se não estiver definida)
+    if (alturaAtual <= 0) {
+      input.value = 0; // Define o valor da caixa de texto como a altura do edifício (ou 0 se não estiver definida)
+      console.log('<=0');
+    } else {
+      input.value = alturaAtual; // Define o valor da caixa de texto como a altura do edifício (ou 0 se não estiver definida)
+      console.log('>0');
+    }
+  }
+  //fim do enxerto para pegar altura do objeto clicado
+
+
   ////fim enxerto
+
+  //enxerto pára download do poligono
+  // Verificar se uma entidade foi clicada
+  /*
+  if (Cesium.defined(pickedObject) && pickedObject.id instanceof Cesium.Entity) {
+    var entity = pickedObject.id;
+    console.log("Entidade selecionada:", entity.name);
+
+    //alert("O polígono selecionado será baixado em formato KML.");
+    var resposta = confirm("Deseja baixar o polígono selecionado?");
+    if (resposta == true) {
+      console.log("Usuário optou por seguir.");
+      // Coloque aqui o código para seguir
+    } else {
+      console.log("Usuário cancelou.");
+      // Coloque aqui o código de cancelamento
+      return; // Sai da função se o usuário cancelar
+    }
+
+    // 2. Criar uma coleção temporária apenas com a entidade clicada
+    var entityCollection = new Cesium.EntityCollection();
+    entityCollection.add(entity);
+
+    // 3. Exportar a entidade para KML
+    Cesium.exportKml({
+      entities: entityCollection
+    }).then(function (result) {
+      // result.kml é uma string XML
+      downloadKml(entity.name || 'entidade', result.kml);
+    });
+  }
+  ///fim exerto download poligono
+  */
+
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+//função para download relacionada ao enxerto na função handler acima
+
+function downloadKml(name, kmlString) {
+  var blob = new Blob([kmlString], { type: 'application/vnd.google-earth.kml+xml' });
+  var url = window.URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = name + '.kml';
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
 
 //Carregar Geometrias Essenciais
 carregarLimite();
@@ -131,7 +195,7 @@ document.getElementById('btnCarregarModelo3D').addEventListener('click', () => {
 
 document.getElementById('btnTeste').addEventListener('click', () => {
   //carregaRotulo();
-  toggleMap();
+  baixarPoligono(viewer, 'exportacao_cesium.kml');
 });
 
 
@@ -160,13 +224,41 @@ document.getElementById('inputArquivo').addEventListener('change', (event) => {
         Cesium.KmlDataSource.load(url, {
           camera: viewer.camera,
           canvas: viewer.canvas,
-          clampToGround: true
+          clampToGround: true,
+
         }).then(function (dataSource) {
+
           viewer.dataSources.add(dataSource);
           viewer.zoomTo(dataSource);
           console.log('Arquivo KML carregado com sucesso!');
 
           const entities = dataSource.entities.values;
+
+          //enxerto para converter polilinhas em polígonos, para que possam ser extrudados
+          entities.forEach(function (entity) {
+            // Verifica se é uma linha
+            if (entity.polyline) {
+              // Obtém as posições (positions) da linha
+              const positions = entity.polyline.positions.getValue(Cesium.JulianDate.now());
+              // Cria um polígono com as mesmas posições
+              dataSource.entities.add({
+                polygon: {
+                  hierarchy: positions,
+                  material: Cesium.Color.RED.withAlpha(0.5), // Estilo do polígono
+                  outline: true,
+                  outlineColor: Cesium.Color.BLACK,
+                  clampToGround: true,
+                  shadows: Cesium.ShadowMode.ENABLED
+
+                }
+              });
+              viewer.zoomTo(dataSource);
+            }
+          });
+          //fim enxerto para converter linhas em poligonos
+
+
+
           for (let i = 0; i < entities.length; i++) {
             const entity = entities[i];
             if (entity.polygon) {
@@ -197,16 +289,16 @@ document.getElementById('inputArquivo').addEventListener('change', (event) => {
                   entity.polygon.material = Cesium.Color.YELLOW; // Cor preenchimento
               }
             }
-            if (entity.polyline) {
-              entity.polyline.width = 2;
-              entity.polyline.clampToGround = true;
-              alert("A geometria carregada não é um polígono, assim não poderá ser extrudada. Apenas polígonos podem ser extrudados, ou seja, elevados a uma altura específica. Linhas e pontos não possuem área para serem extrudados, por isso não terão essa funcionalidade disponível.");
+            // if (entity.polyline) {
+            //   entity.polyline.width = 2;
+            //   entity.polyline.clampToGround = true;
+            //   alert("A geometria carregada não é um polígono, assim não poderá ser extrudada. Apenas polígonos podem ser extrudados, ou seja, elevados a uma altura específica. Linhas e pontos não possuem área para serem extrudados, por isso não terão essa funcionalidade disponível.");
 
-            }
+            // }
           }
-        }).catch(function (erro) {
+        })/*.catch(function (erro) {
           alert('Erro ao carregar arquivo KML: ' + erro);
-        });
+        });*/
       };
       leitor.readAsText(arquivo);
 
