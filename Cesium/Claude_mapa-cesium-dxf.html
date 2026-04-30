@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoMapper — DXF · CesiumJS</title>
+
+  <!-- CesiumJS -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+
+  <!-- dxf-parser via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/dxf-parser@1.1.2/dist/dxf-parser.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+
+    :root {
+      --bg: #0a0c10;
+      --surface: #111318;
+      --border: #1e2230;
+      --accent: #00e5a0;
+      --accent2: #0077ff;
+      --danger: #ff4d6d;
+      --text: #e8eaf0;
+      --muted: #5a607a;
+      --panel-w: 320px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 24px;
+      height: 52px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    header .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.5px;
+      color: var(--accent);
+    }
+    header .logo span { color: var(--text); }
+    header .tagline {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    header .spacer { flex: 1; }
+    header .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+    }
+
+    /* LAYOUT */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* SIDE PANEL */
+    .panel {
+      width: var(--panel-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .panel-section {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-section h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* UPLOAD ZONE */
+    .drop-zone {
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #0d0f14;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(0,229,160,0.04);
+    }
+    .drop-zone .icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .drop-zone p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .drop-zone strong { color: var(--accent); }
+    #file-input { display: none; }
+
+    /* GEOMETRY LIST */
+    .geo-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+    .geo-list::-webkit-scrollbar { width: 4px; }
+    .geo-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .geo-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 6px;
+      background: #0d0f14;
+    }
+    .geo-item:hover { border-color: var(--border); background: #14161e; }
+    .geo-item.selected {
+      border-color: var(--accent);
+      background: rgba(0,229,160,0.06);
+    }
+    .geo-item .geo-color {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .geo-item .geo-info { flex: 1; min-width: 0; }
+    .geo-item .geo-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .geo-item .geo-type {
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .geo-item .geo-del {
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 2px 4px;
+      border-radius: 3px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .geo-item .geo-del:hover { color: var(--danger); background: rgba(255,77,109,0.1); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 2;
+    }
+
+    /* SELECTION INFO */
+    .sel-panel {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      background: #0d0f14;
+    }
+    .sel-panel h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .sel-info {
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .sel-info .val { color: var(--text); }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 11px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+    .btn-primary:hover { background: #00ffb2; transform: translateY(-1px); }
+    .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+    .btn-danger {
+      background: rgba(255,77,109,0.12);
+      color: var(--danger);
+      border: 1px solid rgba(255,77,109,0.3);
+    }
+    .btn-danger:hover { background: rgba(255,77,109,0.22); }
+    .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* MAP */
+    #cesiumContainer {
+      flex: 1;
+      position: relative;
+    }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 12px 22px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      color: var(--text);
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.error { border-left-color: var(--danger); }
+
+    /* LOADING OVERLAY */
+    #loading {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,12,16,0.8);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+    #loading.show { display: flex; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* CLICK HINT */
+    .click-hint {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(17,19,24,0.85);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 0.62rem;
+      color: var(--muted);
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+      line-height: 1.8;
+    }
+    .click-hint kbd {
+      background: var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Geo<span>Mapper</span></div>
+  <div class="tagline">DXF · GeoJSON · Cesium</div>
+  <div class="spacer"></div>
+  <div class="status-dot"></div>
+</header>
+
+<div class="main">
+  <!-- SIDE PANEL -->
+  <div class="panel">
+    <div class="panel-section">
+      <h3>Importar Arquivo</h3>
+      <div class="drop-zone" id="drop-zone">
+        <span class="icon">📐</span>
+        <p>Arraste um arquivo <strong>.dxf</strong> aqui<br>ou clique para selecionar</p>
+      </div>
+      <input type="file" id="file-input" accept=".dxf" />
+    </div>
+
+    <div class="panel-section" style="flex:1; display:flex; flex-direction:column; overflow:hidden; padding-bottom:0;">
+      <h3>Geometrias no Mapa</h3>
+      <div class="geo-list" id="geo-list">
+        <div class="empty-state">
+          Nenhuma geometria carregada.<br>
+          Importe um arquivo .dxf para começar.
+        </div>
+      </div>
+    </div>
+
+    <div class="sel-panel">
+      <h3>Seleção</h3>
+      <div class="sel-info" id="sel-info">
+        Clique em uma geometria no mapa para selecioná-la.
+      </div>
+      <button class="btn btn-primary" id="btn-download" disabled>⬇ Baixar .dxf</button>
+      <button class="btn btn-danger" id="btn-remove" disabled>✕ Remover</button>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div id="cesiumContainer">
+    <div class="click-hint">
+      <kbd>Clique</kbd> geometria para selecionar &nbsp;·&nbsp; <kbd>Scroll</kbd> zoom
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- LOADING -->
+<div id="loading" id="loading">
+  <div class="spinner"></div>
+  <span id="loading-msg">Processando DXF...</span>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// CESIUM INIT (token público gratuito)
+// ─────────────────────────────────────────────
+Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMDA1LTQyMjYtOTMyMC0yMzFhMjBjZmZjMTciLCJpZCoxMjU3LCJpYXQiOjE1OTgwMjY1Mn0.1FNiClUyk00YH_nWfSGpiQAjR5V2OvREDq1PJ5QMjWQ';
+
+const viewer = new Cesium.Viewer('cesiumContainer', {
+  terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+  baseLayerPicker: false,
+  navigationHelpButton: false,
+  homeButton: false,
+  sceneModePicker: true,
+  fullscreenButton: false,
+  geocoder: false,
+  infoBox: false,
+  selectionIndicator: false,
+  animation: false,
+  timeline: false,
+  creditContainer: document.createElement('div'),
+});
+
+// Imagery escura
+viewer.scene.globe.enableLighting = false;
+const imageryLayers = viewer.imageryLayers;
+imageryLayers.removeAll();
+imageryLayers.addImageryProvider(
+  new Cesium.IonImageryProvider({ assetId: 3954 })
+);
+
+// ─────────────────────────────────────────────
+// ESTADO
+// ─────────────────────────────────────────────
+const COLORS = ['#00e5a0','#0077ff','#ff4d6d','#ffd166','#a78bfa','#fb923c','#22d3ee','#f472b6'];
+let colorIdx = 0;
+const geometries = []; // { id, name, type, color, entities[], geojson }
+let selectedId = null;
+
+// ─────────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = isError ? 'error show' : 'show';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = '', 3000);
+}
+function showLoading(msg = 'Processando...') {
+  document.getElementById('loading-msg').textContent = msg;
+  document.getElementById('loading').classList.add('show');
+}
+function hideLoading() {
+  document.getElementById('loading').classList.remove('show');
+}
+
+// ─────────────────────────────────────────────
+// DXF → GEOJSON
+// ─────────────────────────────────────────────
+function dxfToGeoJSON(dxfText, filename) {
+  const parser = new DxfParser();
+  let dxf;
+  try { dxf = parser.parseSync(dxfText); }
+  catch(e) { throw new Error('Falha ao parsear DXF: ' + e.message); }
+
+  const features = [];
+
+  if (!dxf.entities) return { type: 'FeatureCollection', features };
+
+  for (const ent of dxf.entities) {
+    try {
+      const props = { layer: ent.layer || '0', type: ent.type, handle: ent.handle };
+      let geom = null;
+
+      if (ent.type === 'LINE') {
+        geom = { type: 'LineString', coordinates: [
+          [ent.vertices[0].x, ent.vertices[0].y],
+          [ent.vertices[1].x, ent.vertices[1].y],
+        ]};
+      } else if (ent.type === 'LWPOLYLINE' || ent.type === 'POLYLINE') {
+        const verts = ent.vertices.map(v => [v.x, v.y]);
+        if (ent.shape && verts.length >= 3) {
+          verts.push(verts[0]);
+          geom = { type: 'Polygon', coordinates: [verts] };
+        } else {
+          geom = { type: 'LineString', coordinates: verts };
+        }
+      } else if (ent.type === 'CIRCLE') {
+        // approximate circle as polygon
+        const cx = ent.center.x, cy = ent.center.y, r = ent.radius;
+        const pts = [];
+        for (let i = 0; i <= 64; i++) {
+          const a = (i / 64) * 2 * Math.PI;
+          pts.push([cx + Math.cos(a)*r, cy + Math.sin(a)*r]);
+        }
+        geom = { type: 'Polygon', coordinates: [pts] };
+      } else if (ent.type === 'ARC') {
+        const cx = ent.center.x, cy = ent.center.y, r = ent.radius;
+        let sa = ent.startAngle * Math.PI / 180;
+        let ea = ent.endAngle * Math.PI / 180;
+        if (ea < sa) ea += 2 * Math.PI;
+        const pts = [];
+        const steps = 32;
+        for (let i = 0; i <= steps; i++) {
+          const a = sa + (ea - sa) * i / steps;
+          pts.push([cx + Math.cos(a)*r, cy + Math.sin(a)*r]);
+        }
+        geom = { type: 'LineString', coordinates: pts };
+      } else if (ent.type === 'POINT') {
+        geom = { type: 'Point', coordinates: [ent.position.x, ent.position.y] };
+      } else if (ent.type === 'SPLINE' && ent.controlPoints) {
+        const pts = ent.controlPoints.map(p => [p.x, p.y]);
+        geom = { type: 'LineString', coordinates: pts };
+      } else if (ent.type === '3DFACE') {
+        const vs = ent.vertices.map(v => [v.x, v.y]);
+        vs.push(vs[0]);
+        geom = { type: 'Polygon', coordinates: [vs] };
+      }
+
+      if (geom) features.push({ type: 'Feature', geometry: geom, properties: props });
+    } catch(_) {}
+  }
+
+  return { type: 'FeatureCollection', features };
+}
+
+// ─────────────────────────────────────────────
+// GEOJSON → CESIUM ENTITIES
+// ─────────────────────────────────────────────
+function cesiumColor(hexColor, alpha = 1) {
+  return Cesium.Color.fromCssColorString(hexColor).withAlpha(alpha);
+}
+
+function addGeoJSONToCesium(geojson, color, groupId) {
+  const entities = [];
+  const c = cesiumColor(color);
+  const cFill = cesiumColor(color, 0.35);
+
+  const addCoord = (coord) => {
+    // Try to detect if coords are geographic (lon/lat range)
+    // DXF local coords -> center on map
+    return Cesium.Cartesian3.fromDegrees(coord[0], coord[1], 0);
+  };
+
+  for (const feat of geojson.features) {
+    const g = feat.geometry;
+    if (!g) continue;
+
+    try {
+      if (g.type === 'Point') {
+        const e = viewer.entities.add({
+          _groupId: groupId,
+          position: addCoord(g.coordinates),
+          point: { pixelSize: 8, color: c, outlineColor: Cesium.Color.BLACK, outlineWidth: 1 }
+        });
+        entities.push(e);
+      } else if (g.type === 'LineString') {
+        const positions = g.coordinates.map(addCoord);
+        const e = viewer.entities.add({
+          _groupId: groupId,
+          polyline: { positions, width: 2, material: c, clampToGround: true }
+        });
+        entities.push(e);
+      } else if (g.type === 'Polygon') {
+        const positions = g.coordinates[0].map(addCoord);
+        const e = viewer.entities.add({
+          _groupId: groupId,
+          polygon: {
+            hierarchy: new Cesium.PolygonHierarchy(positions),
+            material: cFill,
+            outline: true, outlineColor: c, outlineWidth: 2
+          }
+        });
+        entities.push(e);
+      } else if (g.type === 'MultiLineString') {
+        for (const line of g.coordinates) {
+          const e = viewer.entities.add({
+            _groupId: groupId,
+            polyline: { positions: line.map(addCoord), width: 2, material: c, clampToGround: true }
+          });
+          entities.push(e);
+        }
+      } else if (g.type === 'MultiPolygon') {
+        for (const poly of g.coordinates) {
+          const e = viewer.entities.add({
+            _groupId: groupId,
+            polygon: {
+              hierarchy: new Cesium.PolygonHierarchy(poly[0].map(addCoord)),
+              material: cFill,
+              outline: true, outlineColor: c, outlineWidth: 2
+            }
+          });
+          entities.push(e);
+        }
+      }
+    } catch(_) {}
+  }
+  return entities;
+}
+
+// ─────────────────────────────────────────────
+// COORDS: auto-center se não forem lon/lat
+// ─────────────────────────────────────────────
+function normalizeGeoJSON(geojson) {
+  // Coleta todos os pontos
+  const allCoords = [];
+  const collect = (c) => {
+    if (!c || c.length === 0) return;
+    if (typeof c[0] === 'number') { allCoords.push(c); return; }
+    c.forEach(collect);
+  };
+  geojson.features.forEach(f => f.geometry && collect(f.geometry.coordinates));
+
+  if (allCoords.length === 0) return geojson;
+
+  const xs = allCoords.map(c => c[0]);
+  const ys = allCoords.map(c => c[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+
+  // Se parecer coordenadas geográficas válidas, não normaliza
+  const isGeo = Math.abs(cx) <= 180 && Math.abs(cy) <= 90 && (maxX - minX) < 360;
+  if (isGeo) return geojson;
+
+  // Normaliza para centrar em lon=-43.37, lat=-22.37 (Macaé, RJ) com escala
+  const targetLon = -43.37, targetLat = -22.37;
+  const span = Math.max(maxX - minX, maxY - minY) || 1;
+  const scale = 0.5 / span; // ~0.5 graus de extensão
+
+  const transform = (c) => {
+    if (!c || c.length === 0) return c;
+    if (typeof c[0] === 'number') return [
+      targetLon + (c[0] - cx) * scale,
+      targetLat + (c[1] - cy) * scale,
+    ];
+    return c.map(transform);
+  };
+
+  const transformGeom = (g) => {
+    if (!g) return g;
+    return { ...g, coordinates: transform(g.coordinates) };
+  };
+
+  return {
+    ...geojson,
+    features: geojson.features.map(f => ({ ...f, geometry: transformGeom(f.geometry) }))
+  };
+}
+
+// ─────────────────────────────────────────────
+// RENDER LISTA
+// ─────────────────────────────────────────────
+function renderList() {
+  const list = document.getElementById('geo-list');
+  if (geometries.length === 0) {
+    list.innerHTML = '<div class="empty-state">Nenhuma geometria carregada.<br>Importe um arquivo .dxf para começar.</div>';
+    return;
+  }
+  list.innerHTML = geometries.map(g => `
+    <div class="geo-item ${g.id === selectedId ? 'selected' : ''}" data-id="${g.id}">
+      <div class="geo-color" style="background:${g.color}"></div>
+      <div class="geo-info">
+        <div class="geo-name" title="${g.name}">${g.name}</div>
+        <div class="geo-type">${g.features} feature${g.features !== 1 ? 's' : ''}</div>
+      </div>
+      <button class="geo-del" data-del="${g.id}" title="Remover">✕</button>
+    </div>
+  `).join('');
+}
+
+function updateSelUI() {
+  const sel = geometries.find(g => g.id === selectedId);
+  const info = document.getElementById('sel-info');
+  const btnDl = document.getElementById('btn-download');
+  const btnRm = document.getElementById('btn-remove');
+
+  if (!sel) {
+    info.innerHTML = 'Clique em uma geometria no mapa para selecioná-la.';
+    btnDl.disabled = true;
+    btnRm.disabled = true;
+  } else {
+    info.innerHTML = `
+      <div><span class="val">${sel.name}</span></div>
+      <div>Features: <span class="val">${sel.features}</span></div>
+      <div>Cor: <span style="color:${sel.color}">${sel.color}</span></div>
+    `;
+    btnDl.disabled = false;
+    btnRm.disabled = false;
+  }
+  renderList();
+  highlightSelected();
+}
+
+function highlightSelected() {
+  for (const g of geometries) {
+    const isSel = g.id === selectedId;
+    const c = isSel ? cesiumColor('#ffffff') : cesiumColor(g.color);
+    const cFill = isSel ? cesiumColor('#ffffff', 0.5) : cesiumColor(g.color, 0.35);
+    for (const e of g.entities) {
+      if (e.polyline) e.polyline.material = c;
+      if (e.polygon) { e.polygon.material = cFill; e.polygon.outlineColor = c; }
+      if (e.point) e.point.color = c;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// ADD GEOMETRY GROUP
+// ─────────────────────────────────────────────
+function addGeometryGroup(name, geojson, rawDXF) {
+  const id = 'geo_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  const color = COLORS[colorIdx % COLORS.length];
+  colorIdx++;
+
+  const normalized = normalizeGeoJSON(geojson);
+  const entities = addGeoJSONToCesium(normalized, color, id);
+
+  geometries.push({
+    id, name, color,
+    entities,
+    features: geojson.features.length,
+    geojson: normalized,
+    rawDXF
+  });
+
+  // Fly to
+  if (entities.length > 0) {
+    viewer.flyTo(entities, { duration: 1.5 });
+  }
+
+  renderList();
+  showToast(`✓ "${name}" importado — ${geojson.features.length} features`);
+}
+
+// ─────────────────────────────────────────────
+// REMOVE
+// ─────────────────────────────────────────────
+function removeGroup(id) {
+  const idx = geometries.findIndex(g => g.id === id);
+  if (idx < 0) return;
+  const g = geometries[idx];
+  g.entities.forEach(e => viewer.entities.remove(e));
+  geometries.splice(idx, 1);
+  if (selectedId === id) { selectedId = null; }
+  renderList();
+  updateSelUI();
+  showToast('Geometria removida');
+}
+
+// ─────────────────────────────────────────────
+// GEOJSON → DXF EXPORT
+// ─────────────────────────────────────────────
+function geojsonToDXF(geojson, name) {
+  const entities = [];
+
+  const addLine = (pts) => {
+    if (pts.length < 2) return;
+    for (let i = 0; i < pts.length - 1; i++) {
+      entities.push(
+        `0\nLINE\n8\n${name}\n` +
+        `10\n${pts[i][0].toFixed(6)}\n20\n${pts[i][1].toFixed(6)}\n30\n0.0\n` +
+        `11\n${pts[i+1][0].toFixed(6)}\n21\n${pts[i+1][1].toFixed(6)}\n31\n0.0`
+      );
+    }
+  };
+
+  const addPoint = (pt) => {
+    entities.push(
+      `0\nPOINT\n8\n${name}\n` +
+      `10\n${pt[0].toFixed(6)}\n20\n${pt[1].toFixed(6)}\n30\n0.0`
+    );
+  };
+
+  for (const feat of geojson.features) {
+    const g = feat.geometry;
+    if (!g) continue;
+    if (g.type === 'Point') addPoint(g.coordinates);
+    else if (g.type === 'LineString') addLine(g.coordinates);
+    else if (g.type === 'Polygon') g.coordinates.forEach(ring => addLine(ring));
+    else if (g.type === 'MultiLineString') g.coordinates.forEach(addLine);
+    else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => poly.forEach(ring => addLine(ring)));
+    else if (g.type === 'MultiPoint') g.coordinates.forEach(addPoint);
+  }
+
+  const dxf = [
+    '0\nSECTION\n2\nHEADER\n0\nENDSEC',
+    '0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n70\n1',
+    `0\nLAYER\n2\n${name}\n70\n0\n62\n7\n6\nCONTINUOUS`,
+    '0\nENDTAB\n0\nENDSEC',
+    '0\nSECTION\n2\nENTITIES',
+    ...entities,
+    '0\nENDSEC\n0\nEOF'
+  ].join('\n');
+
+  return dxf;
+}
+
+function downloadDXF(id) {
+  const g = geometries.find(x => x.id === id);
+  if (!g) return;
+
+  // Se tiver o DXF original, baixa ele; senão regenera do geojson
+  const content = g.rawDXF || geojsonToDXF(g.geojson, g.name.replace(/\.dxf$/i,''));
+  const blob = new Blob([content], { type: 'application/dxf' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = g.name.replace(/\.dxf$/i,'') + '_export.dxf';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`⬇ Download: ${a.download}`);
+}
+
+// ─────────────────────────────────────────────
+// FILE HANDLING
+// ─────────────────────────────────────────────
+async function processFile(file) {
+  if (!file.name.toLowerCase().endsWith('.dxf')) {
+    showToast('Apenas arquivos .dxf são suportados', true);
+    return;
+  }
+  showLoading('Convertendo DXF → GeoJSON...');
+  await new Promise(r => setTimeout(r, 60));
+
+  try {
+    const text = await file.text();
+    const geojson = dxfToGeoJSON(text, file.name);
+    if (geojson.features.length === 0) {
+      hideLoading();
+      showToast('Nenhuma geometria encontrada no arquivo', true);
+      return;
+    }
+    addGeometryGroup(file.name, geojson, text);
+  } catch(e) {
+    showToast('Erro: ' + e.message, true);
+  } finally {
+    hideLoading();
+  }
+}
+
+// ─────────────────────────────────────────────
+// DROP ZONE
+// ─────────────────────────────────────────────
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => {
+  [...e.target.files].forEach(processFile);
+  e.target.value = '';
+});
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  [...e.dataTransfer.files].forEach(processFile);
+});
+
+// ─────────────────────────────────────────────
+// LIST CLICKS
+// ─────────────────────────────────────────────
+document.getElementById('geo-list').addEventListener('click', e => {
+  const delBtn = e.target.closest('[data-del]');
+  if (delBtn) { removeGroup(delBtn.dataset.del); return; }
+  const item = e.target.closest('[data-id]');
+  if (item) {
+    selectedId = item.dataset.id;
+    updateSelUI();
+    const g = geometries.find(x => x.id === selectedId);
+    if (g && g.entities.length) viewer.flyTo(g.entities, { duration: 1 });
+  }
+});
+
+// ─────────────────────────────────────────────
+// CESIUM CLICK PICK
+// ─────────────────────────────────────────────
+const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+handler.setInputAction((click) => {
+  const picked = viewer.scene.pick(click.position);
+  if (!picked || !picked.id) { selectedId = null; updateSelUI(); return; }
+  const entity = picked.id;
+  const gid = entity._groupId;
+  if (gid) {
+    selectedId = gid;
+    updateSelUI();
+  }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+// ─────────────────────────────────────────────
+// BUTTONS
+// ─────────────────────────────────────────────
+document.getElementById('btn-download').addEventListener('click', () => {
+  if (selectedId) downloadDXF(selectedId);
+});
+document.getElementById('btn-remove').addEventListener('click', () => {
+  if (selectedId) removeGroup(selectedId);
+});
+
+// ─────────────────────────────────────────────
+// DEMO: carregar geometria exemplo
+// ─────────────────────────────────────────────
+(function loadDemo() {
+  const demoGeoJSON = {
+    type: 'FeatureCollection',
+    features: [
+      { type: 'Feature', properties: { layer: 'DEMO', type: 'LWPOLYLINE' },
+        geometry: { type: 'Polygon', coordinates: [[
+          [-43.38, -22.38], [-43.36, -22.38], [-43.36, -22.36],
+          [-43.38, -22.36], [-43.38, -22.38]
+        ]]}},
+      { type: 'Feature', properties: { layer: 'DEMO', type: 'LINE' },
+        geometry: { type: 'LineString', coordinates: [
+          [-43.39, -22.40], [-43.35, -22.34]
+        ]}},
+      { type: 'Feature', properties: { layer: 'DEMO', type: 'CIRCLE' },
+        geometry: { type: 'Polygon', coordinates: [
+          Array.from({length:65}, (_,i) => {
+            const a = (i/64)*2*Math.PI;
+            return [-43.37 + Math.cos(a)*0.008, -22.37 + Math.sin(a)*0.008];
+          })
+        ]}},
+      { type: 'Feature', properties: { layer: 'DEMO', type: 'POINT' },
+        geometry: { type: 'Point', coordinates: [-43.37, -22.37] }},
+    ]
+  };
+  addGeometryGroup('exemplo_demo.dxf', demoGeoJSON, null);
+  showToast('Exemplo carregado — importe seu .dxf!');
+})();
+</script>
+</body>
+</html>
