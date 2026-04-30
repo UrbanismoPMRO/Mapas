@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DXF ↔ GeoJSON · Cesium</title>
+
+  <!-- CesiumJS -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Widgets/widgets.css" rel="stylesheet"/>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; height: 100vh; display: flex; flex-direction: column; }
+
+    header {
+      padding: 14px 20px;
+      background: #16213e;
+      border-bottom: 1px solid #0f3460;
+      display: flex; align-items: center; gap: 12px;
+    }
+    header h1 { font-size: 16px; font-weight: 600; color: #e94560; letter-spacing: 0.5px; }
+    header p  { font-size: 12px; color: #aaa; margin-top: 2px; }
+
+    #upload-bar {
+      background: #16213e;
+      border-bottom: 1px solid #0f3460;
+      padding: 10px 20px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    #upload-bar label {
+      display: flex; align-items: center; gap: 8px;
+      background: #0f3460; border: 1px dashed #e94560;
+      color: #e0e0e0; font-size: 13px; padding: 7px 14px;
+      border-radius: 6px; cursor: pointer; transition: background .2s;
+    }
+    #upload-bar label:hover { background: #1a2a50; }
+    #upload-bar input[type=file] { display: none; }
+    #file-name { font-size: 12px; color: #aaa; }
+    #clear-btn {
+      margin-left: auto; background: transparent; border: 1px solid #555;
+      color: #aaa; font-size: 12px; padding: 5px 12px; border-radius: 6px;
+      cursor: pointer; transition: all .2s; display: none;
+    }
+    #clear-btn:hover { border-color: #e94560; color: #e94560; }
+
+    #cesiumContainer { flex: 1; position: relative; }
+
+    /* Tooltip personalizado */
+    #map-tooltip {
+      position: fixed;
+      background: #16213e;
+      border: 1px solid #0f3460;
+      color: #e0e0e0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.6;
+      pointer-events: none;
+      z-index: 999;
+      display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.5);
+      max-width: 240px;
+    }
+
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #0f3460; color: #fff; padding: 10px 20px; border-radius: 8px;
+      font-size: 13px; box-shadow: 0 4px 20px rgba(0,0,0,.5);
+      transition: transform .3s ease; pointer-events: none; z-index: 9999;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Oculta créditos e widgets desnecessários */
+    .cesium-widget-credits,
+    .cesium-credit-container { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🗺 DXF ↔ GeoJSON · Cesium</h1>
+    <p>Clique no polígono para baixar como .dxf · ou importe um .dxf para visualizar</p>
+  </div>
+</header>
+
+<div id="upload-bar">
+  <label>
+    📂 Importar .dxf
+    <input type="file" id="dxf-input" accept=".dxf">
+  </label>
+  <span id="file-name">Nenhum arquivo carregado</span>
+  <button id="clear-btn" onclick="clearImported()">✕ Remover</button>
+</div>
+
+<div id="cesiumContainer"></div>
+<div id="map-tooltip"></div>
+<div id="toast">⬇️ Download iniciado!</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// 1. POLÍGONO GEOJSON (mesmo dado original)
+// ─────────────────────────────────────────────────────────────────────────────
+const geojsonData = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Área de Exemplo",
+        "descricao": "Polígono demonstrativo – clique para baixar como .dxf"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-43.1866, -22.9121],
+          [-43.1820, -22.9121],
+          [-43.1820, -22.9080],
+          [-43.1866, -22.9080],
+          [-43.1866, -22.9121]
+        ]]
+      }
+    }
+  ]
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 2. CESIUM INIT
+// ─────────────────────────────────────────────────────────────────────────────
+Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMDA1LTQyMjYtOTMyMC0yMzFhMjBjZmZjMTciLCJpZCI6MTI1NywiaWF0IjoxNTk4MDI2NTJ9.1FNiClUyk00YH_nWfSGpiQAjR5V2OvREDq1PJ5QMjWQ';
+
+const viewer = new Cesium.Viewer('cesiumContainer', {
+  terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+  baseLayerPicker:       false,
+  navigationHelpButton:  false,
+  homeButton:            false,
+  sceneModePicker:       false,
+  fullscreenButton:      false,
+  geocoder:              false,
+  infoBox:               false,
+  selectionIndicator:    false,
+  animation:             false,
+  timeline:              false,
+  creditContainer:       document.createElement('div'),
+});
+
+// Imagery escura (CartoDB Dark equivalente)
+viewer.imageryLayers.removeAll();
+viewer.imageryLayers.addImageryProvider(
+  new Cesium.UrlTemplateImageryProvider({
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+    subdomains: ['a','b','c','d'],
+    maximumLevel: 19,
+  })
+);
+
+// Estilos de cor (equivalentes ao Leaflet style / hoverStyle)
+const COLOR_NORMAL  = Cesium.Color.fromCssColorString('#e94560');
+const COLOR_HOVER   = Cesium.Color.fromCssColorString('#ffd700');
+const COLOR_IMPORT  = Cesium.Color.fromCssColorString('#00d4aa');
+const COLOR_IMP_HOV = Cesium.Color.fromCssColorString('#ffd700');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3. TOOLTIP
+// ─────────────────────────────────────────────────────────────────────────────
+const tooltip = document.getElementById('map-tooltip');
+
+function showTooltip(x, y, html) {
+  tooltip.innerHTML = html;
+  tooltip.style.display = 'block';
+  moveTooltip(x, y);
+}
+function moveTooltip(x, y) {
+  tooltip.style.left = (x + 16) + 'px';
+  tooltip.style.top  = (y + 16) + 'px';
+}
+function hideTooltip() {
+  tooltip.style.display = 'none';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 4. REGISTRO DE ENTIDADES (para rastrear grupo → metadados)
+// ─────────────────────────────────────────────────────────────────────────────
+// Cada entrada: { entity, feature, isImported, outlineEntity }
+const entityRegistry = [];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. ADICIONAR GEOJSON AO CESIUM
+//    Equivalente ao L.geoJSON(...).addTo(map)
+// ─────────────────────────────────────────────────────────────────────────────
+function addGeoJSONLayer(geojson, fillColor, isImported) {
+  const addedEntities = [];
+
+  for (const feature of geojson.features) {
+    const geom  = feature.geometry;
+    const props = feature.properties || {};
+    const name  = props.name || 'Polígono';
+    const desc  = props.descricao || (props.layer ? 'Layer: ' + props.layer : '');
+
+    const rings = geom.type === 'Polygon'
+      ? geom.coordinates
+      : geom.coordinates.flat(); // MultiPolygon
+
+    for (const ring of (geom.type === 'MultiPolygon' ? geom.coordinates : [geom.coordinates])) {
+      const outerRing = ring[0];
+
+      // Posições Cesium a partir de [lon, lat]
+      const positions = outerRing.map(([lon, lat]) =>
+        Cesium.Cartesian3.fromDegrees(lon, lat, 0)
+      );
+
+      // Polígono preenchido
+      const entity = viewer.entities.add({
+        polygon: {
+          hierarchy:       new Cesium.PolygonHierarchy(positions),
+          material:        fillColor.withAlpha(0.18),
+          outline:         true,
+          outlineColor:    fillColor,
+          outlineWidth:    2.5,
+          height:          0,
+          classificationType: Cesium.ClassificationType.TERRAIN,
+        },
+        // metadados acessíveis no pick
+        _meta: { feature, name, desc, isImported, fillColor }
+      });
+
+      entityRegistry.push({ entity, feature, name, desc, isImported, fillColor });
+      addedEntities.push(entity);
+    }
+  }
+
+  return addedEntities;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. CARREGAR GEOJSON PADRÃO (equivalente ao geojsonLayer inicial)
+// ─────────────────────────────────────────────────────────────────────────────
+const defaultEntities = addGeoJSONLayer(geojsonData, COLOR_NORMAL, false);
+
+// Fly to bounds do polígono padrão (equivalente ao map.fitBounds)
+viewer.flyTo(defaultEntities, { duration: 0 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. INTERAÇÃO COM O MAPA (hover + click)
+//    Substitui layer.on('mouseover'), layer.on('mouseout'), layer.on('click')
+// ─────────────────────────────────────────────────────────────────────────────
+let hoveredEntity = null;
+const canvas = viewer.scene.canvas;
+
+// MOUSEMOVE → tooltip + hover highlight
+canvas.addEventListener('mousemove', (e) => {
+  const picked = viewer.scene.pick(new Cesium.Cartesian2(e.clientX, e.clientY));
+
+  if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id._meta) {
+    const meta = picked.id._meta;
+
+    // Hover highlight
+    if (hoveredEntity !== picked.id) {
+      // Restaura entidade anterior
+      if (hoveredEntity && hoveredEntity._meta) {
+        const prev = hoveredEntity._meta;
+        hoveredEntity.polygon.material   = prev.fillColor.withAlpha(0.18);
+        hoveredEntity.polygon.outlineColor = new Cesium.CallbackProperty(() => prev.fillColor, false);
+      }
+      hoveredEntity = picked.id;
+      // Aplica hover
+      const hoverColor = meta.isImported ? COLOR_IMP_HOV : COLOR_HOVER;
+      hoveredEntity.polygon.material     = hoverColor.withAlpha(0.35);
+      hoveredEntity.polygon.outlineColor = new Cesium.CallbackProperty(() => hoverColor, false);
+      canvas.style.cursor = 'pointer';
+    }
+
+    // Tooltip (equivalente ao bindTooltip sticky)
+    const html = `<b>${meta.name}</b>${meta.desc ? '<br><small>' + meta.desc + '</small>' : ''}`;
+    showTooltip(e.clientX, e.clientY, html);
+
+  } else {
+    // Mouse fora de qualquer entidade
+    if (hoveredEntity && hoveredEntity._meta) {
+      const prev = hoveredEntity._meta;
+      hoveredEntity.polygon.material     = prev.fillColor.withAlpha(0.18);
+      hoveredEntity.polygon.outlineColor = new Cesium.CallbackProperty(() => prev.fillColor, false);
+      hoveredEntity = null;
+      canvas.style.cursor = 'default';
+    }
+    hideTooltip();
+  }
+
+  // Move tooltip junto com o mouse
+  if (tooltip.style.display !== 'none') moveTooltip(e.clientX, e.clientY);
+});
+
+// LEFT CLICK → download DXF (equivalente ao layer.on('click'))
+const clickHandler = new Cesium.ScreenSpaceEventHandler(canvas);
+clickHandler.setInputAction((click) => {
+  const picked = viewer.scene.pick(click.position);
+  if (!Cesium.defined(picked) || !Cesium.defined(picked.id) || !picked.id._meta) return;
+
+  const meta = picked.id._meta;
+  const label = meta.isImported ? `"${meta.name}.dxf" re-exportado!` : `"${meta.name}.dxf" baixado!`;
+
+  downloadDXF(meta.feature.geometry, meta.name);
+  showToast(`✅ ${label}`);
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 8. CONVERSÃO GeoJSON → DXF (idêntico ao original)
+// ─────────────────────────────────────────────────────────────────────────────
+function buildDXF(geometry) {
+  const rings = [];
+
+  if (geometry.type === 'Polygon') {
+    geometry.coordinates.forEach(r => rings.push(r));
+  } else if (geometry.type === 'MultiPolygon') {
+    geometry.coordinates.forEach(poly => poly.forEach(r => rings.push(r)));
+  } else {
+    throw new Error('Geometria não suportada: ' + geometry.type);
+  }
+
+  let dxf = `  0\nSECTION\n  2\nHEADER\n  9\n$ACADVER\n  1\nAC1009\n  0\nENDSEC\n`;
+  dxf += `  0\nSECTION\n  2\nENTITIES\n`;
+
+  rings.forEach(ring => {
+    const pts = [...ring];
+    const first = pts[0], last = pts[pts.length - 1];
+    if (first[0] !== last[0] || first[1] !== last[1]) pts.push(first);
+
+    dxf += `  0\nPOLYLINE\n  8\n0\n 66\n     1\n 70\n     1\n`;
+
+    pts.forEach(([x, y]) => {
+      dxf += `  0\nVERTEX\n  8\n0\n 10\n${x.toFixed(8)}\n 20\n${y.toFixed(8)}\n 30\n0.0\n`;
+    });
+
+    dxf += `  0\nSEQEND\n  8\n0\n`;
+  });
+
+  dxf += `  0\nENDSEC\n  0\nEOF\n`;
+  return dxf;
+}
+
+function downloadDXF(geometry, name) {
+  const content = buildDXF(geometry);
+  const blob    = new Blob([content], { type: 'application/dxf' });
+  const url     = URL.createObjectURL(blob);
+  const a       = document.createElement('a');
+  a.href        = url;
+  a.download    = `${name.replace(/\s+/g, '_')}.dxf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 9. TOAST (idêntico ao original)
+// ─────────────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 10. PARSER DXF → GeoJSON (idêntico ao original)
+// ─────────────────────────────────────────────────────────────────────────────
+function tokenizeDXF(text) {
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const tokens = [];
+  for (let i = 0; i + 1 < lines.length; i += 2) {
+    const code  = parseInt(lines[i].trim(), 10);
+    const value = lines[i + 1].trim();
+    if (!isNaN(code)) tokens.push([code, value]);
+  }
+  return tokens;
+}
+
+function parseDXF(text) {
+  const tokens = tokenizeDXF(text);
+  const polygons = [];
+  let i = 0;
+
+  while (i < tokens.length) {
+    const [code, value] = tokens[i];
+
+    // LWPOLYLINE
+    if (code === 0 && value === 'LWPOLYLINE') {
+      const pts = [];
+      let closed = false;
+      let layer  = '0';
+      i++;
+      while (i < tokens.length && tokens[i][0] !== 0) {
+        const [c, v] = tokens[i];
+        if (c === 8)  layer  = v;
+        if (c === 70) closed = (parseInt(v, 10) & 1) === 1;
+        if (c === 10) pts.push([parseFloat(v), null]);
+        if (c === 20 && pts.length > 0) pts[pts.length - 1][1] = parseFloat(v);
+        i++;
+      }
+      const valid = pts.filter(p => p[1] !== null);
+      if (valid.length >= 3) {
+        if (closed) valid.push([...valid[0]]);
+        polygons.push({ pts: valid, layer });
+      }
+      continue;
+    }
+
+    // POLYLINE + VERTEX (R12)
+    if (code === 0 && value === 'POLYLINE') {
+      const pts  = [];
+      let closed = false;
+      let layer  = '0';
+      i++;
+      while (i < tokens.length && tokens[i][0] !== 0) {
+        const [c, v] = tokens[i];
+        if (c === 8)  layer  = v;
+        if (c === 70) closed = (parseInt(v, 10) & 1) === 1;
+        i++;
+      }
+      while (i < tokens.length) {
+        const [c, v] = tokens[i];
+        if (c === 0 && v === 'SEQEND') { i++; break; }
+        if (c === 0 && v === 'VERTEX') {
+          let x = null, y = null;
+          i++;
+          while (i < tokens.length && tokens[i][0] !== 0) {
+            const [vc, vv] = tokens[i];
+            if (vc === 10) x = parseFloat(vv);
+            if (vc === 20) y = parseFloat(vv);
+            i++;
+          }
+          if (x !== null && y !== null) pts.push([x, y]);
+        } else {
+          i++;
+        }
+      }
+      if (pts.length >= 3) {
+        if (closed) pts.push([...pts[0]]);
+        polygons.push({ pts, layer });
+      }
+      continue;
+    }
+
+    i++;
+  }
+
+  return polygons;
+}
+
+function dxfPolygonsToGeoJSON(polygons, filename) {
+  return {
+    type: 'FeatureCollection',
+    features: polygons.map((poly, idx) => ({
+      type: 'Feature',
+      properties: {
+        name:  `${filename} — polígono ${idx + 1}`,
+        layer: poly.layer
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [poly.pts]
+      }
+    }))
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 11. IMPORT DXF (equivalente ao listener do dxf-input original)
+// ─────────────────────────────────────────────────────────────────────────────
+let importedEntities = [];
+
+document.getElementById('dxf-input').addEventListener('change', function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const text  = e.target.result;
+      const polys = parseDXF(text);
+
+      if (polys.length === 0) {
+        showToast('⚠️ Nenhum polígono encontrado no arquivo.');
+        return;
+      }
+
+      const name    = file.name.replace('.dxf', '').replace(/_/g, ' ');
+      const geojson = dxfPolygonsToGeoJSON(polys, name);
+
+      // Remove camada anterior se existir (equivalente ao map.removeLayer)
+      clearImported(true);
+
+      importedEntities = addGeoJSONLayer(geojson, COLOR_IMPORT, true);
+
+      // Fly to bounds (equivalente ao map.fitBounds)
+      viewer.flyTo(importedEntities, { duration: 1.2 });
+
+      document.getElementById('file-name').textContent =
+        `${file.name} · ${polys.length} polígono(s)`;
+      document.getElementById('clear-btn').style.display = 'inline-block';
+
+      showToast(`✅ ${polys.length} polígono(s) importado(s)!`);
+    } catch (err) {
+      showToast('❌ Erro ao ler o arquivo: ' + err.message);
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+  this.value = '';
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 12. CLEAR IMPORTED (equivalente ao clearImported original)
+// ─────────────────────────────────────────────────────────────────────────────
+function clearImported(silent = false) {
+  // Remove entidades importadas do viewer e do registry
+  for (const entity of importedEntities) {
+    viewer.entities.remove(entity);
+    const idx = entityRegistry.findIndex(r => r.entity === entity);
+    if (idx >= 0) entityRegistry.splice(idx, 1);
+  }
+  importedEntities = [];
+
+  if (!silent) {
+    document.getElementById('file-name').textContent = 'Nenhum arquivo carregado';
+    document.getElementById('clear-btn').style.display = 'none';
+    showToast('🗑️ Camada removida.');
+  }
+}
+</script>
+</body>
+</html>

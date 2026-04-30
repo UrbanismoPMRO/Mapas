@@ -341,7 +341,7 @@
   <!-- SIDE PANEL -->
   <div class="panel">
     <div class="panel-section">
-      <h3>Importar Arquivo</h3>
+      <h3>Importar Arquivo - TESTE</h3>
       <div class="drop-zone" id="drop-zone">
         <span class="icon">📐</span>
         <p>Arraste um arquivo <strong>.dxf</strong> aqui<br>ou clique para selecionar</p>
@@ -390,10 +390,11 @@
 // ─────────────────────────────────────────────
 // CESIUM INIT (token público gratuito)
 // ─────────────────────────────────────────────
-Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMDA1LTQyMjYtOTMyMC0yMzFhMjBjZmZjMTciLCJpZCoxMjU3LCJpYXQiOjE1OTgwMjY1Mn0.1FNiClUyk00YH_nWfSGpiQAjR5V2OvREDq1PJ5QMjWQ';
+Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0ODZjMmYzNi0xOWY1LTQ3MTUtYWUyZi0xN2JiNzAzYzBiZmEiLCJpZCI6NDExOTAyLCJpYXQiOjE3NzY5MDYzMjd9.xn_gQkIubaTFM3Jkxr3f6qVwDrKBmcS2pXm2VX-JBDw';
 
 const viewer = new Cesium.Viewer('cesiumContainer', {
-  terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+  terrain: Cesium.Terrain.fromWorldTerrain(),
+  //terrainProvider: new Cesium.EllipsoidTerrainProvider(),
   baseLayerPicker: false,
   navigationHelpButton: false,
   homeButton: false,
