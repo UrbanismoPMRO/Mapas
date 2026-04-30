@@ -23,6 +23,12 @@ osmLayer.show = false;
 let CotaSoleiraAtual = 0; //armazena a cota da soleira depois de ser alterada, para que a função de alterar a cota de soleira possa usar esse valor atualizado para calcular a nova altura do edifício, caso o usuário queira alterar a cota de soleira mais de uma vez.
 let pickedObject;
 
+
+//######################################################
+
+
+//#########################################################
+
 // Criar o manipulador de eventos de clique
 function pegaObjetoClicado() {
     var mousePosition;
