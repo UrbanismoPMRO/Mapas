@@ -40,7 +40,7 @@
 #btnCarregaArquivo {
     position: absolute;
     top: 10px;
-    left: 180px;
+    left: 10px;
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -124,7 +124,7 @@
     /* top: 110px; */
     /* left: 160px; */
     width: 80px;
-    height: 20px;
+    height: 23px;
     padding: 5px 5px;
     background-color: #e9cc4d;
     color: white;
@@ -132,6 +132,9 @@
     border-radius: 5px;
     cursor: pointer;
     z-index: 999;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
 }
 
 #boxAlturaEdif {
@@ -139,7 +142,7 @@
     /* top: 80px; */
     /* left: 160px; */
     width: 80px;
-    height: 20px;
+    height: 23px;
     padding: 5px 5px;
     background-color: #e9cc4d;
     color: white;
@@ -147,6 +150,10 @@
     border-radius: 5px;
     cursor: pointer;
     z-index: 999;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+
 }
 
 

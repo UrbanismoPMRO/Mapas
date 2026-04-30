@@ -1,5 +1,7 @@
 import { varPontoSelecionado } from "./config.js";
-import { CotaSoleiraAtual, pickedObject } from "./index.js";
+import { handler } from "./index.js";
+import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
+
 
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
 const viewer = new Cesium.Viewer('cesiumContainer', {
@@ -17,6 +19,88 @@ const osmLayer = viewer.imageryLayers.addImageryProvider(
     })
 );
 osmLayer.show = false;
+
+let CotaSoleiraAtual = 0; //armazena a cota da soleira depois de ser alterada, para que a função de alterar a cota de soleira possa usar esse valor atualizado para calcular a nova altura do edifício, caso o usuário queira alterar a cota de soleira mais de uma vez.
+let pickedObject;
+
+// Criar o manipulador de eventos de clique
+function pegaObjetoClicado() {
+    var mousePosition;
+    var varCartesiano;
+    var varCartografico;
+    // 4. Capturar a posição do clique (2D - pixeis)
+    handler.setInputAction(function (click) {
+        // 4. Selecionar o objeto clicado
+        pickedObject = viewer.scene.pick(click.position);
+        // 5. Verificar se foi um polígono
+        // 4. Capturar a posição do clique (2D - pixeis)
+        const mousePosition = click.position;
+        if (Cesium.defined(mousePosition)) {
+            // 5. Converter a posição de tela para a superfície do elipsoide (3D - ECEF)
+            varCartesiano = viewer.camera.pickEllipsoid(mousePosition, viewer.scene.globe.ellipsoid);
+            if (Cesium.defined(varCartesiano)) {
+                // 6. Converter de ECEF para Cartográfico (Latitude/Longitude em Radianos)
+                varCartografico = Cesium.Cartographic.fromCartesian(varCartesiano);
+                // 7. Converter Radianos para Graus
+                varPontoSelecionado.varLongitude = Cesium.Math.toDegrees(varCartografico.longitude);
+                varPontoSelecionado.varLatitude = Cesium.Math.toDegrees(varCartografico.latitude);
+                varPontoSelecionado.varAltura = viewer.scene.globe.getHeight(varCartografico); // Opcional: altura do terreno
+                console.log(`Longitude: ${varPontoSelecionado.varLongitude}, Latitude: ${varPontoSelecionado.varLatitude}, Altura: ${varPontoSelecionado.varAltura}`);
+            }
+        }
+
+        //enxerto para pegar altura do objeto clicado
+        if (Cesium.defined(pickedObject) && pickedObject.id instanceof Cesium.Entity) {
+            var entity = pickedObject.id;
+            // Verificação do tipo de geometria
+            if (Cesium.defined(entity.polygon)) {
+                console.log("O objeto clicado é um Polígono.");
+            } else if (Cesium.defined(entity.polyline)) {
+                console.log("O objeto clicado é uma Polilinha (Polyline).");
+            }
+            var input = document.getElementById("boxAlturaEdif");
+            // Proteção: só acessa extrudedHeight se for um polígono
+            var alturaAtual = (entity.polygon && entity.polygon.extrudedHeight ? entity.polygon.extrudedHeight.getValue(Cesium.JulianDate.now()) : 0) - CotaSoleiraAtual;
+            if (alturaAtual <= 0) {
+                input.value = 0; // Define o valor da caixa de texto como a altura do edifício (ou 0 se não estiver definida)
+                console.log('<=0');
+            } else {
+                input.value = alturaAtual; // Define o valor da caixa de texto como a altura do edifício (ou 0 se não estiver definida)
+                console.log('>0');
+            }
+        }
+        //fim do enxerto para pegar altura do objeto clicado
+
+        /*habilitar a função abixo para baixar poligonos clicados
+        baixarPoligonoSelecionado();
+        */
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
+
+//MarcosAstronõmicos
+function AtivaSliderMarcoAstronomico() {
+  // Slider de Marcos Astronômicos
+  const sliderMarco = document.getElementById('sliderMarcoastronomico');
+  const labelMarco = document.getElementById('labelMarco');
+  const opcoesMarco = [
+    { valor: '', label: 'Selecione' },
+    { valor: '1', label: 'Hora Atual' },
+    { valor: '2', label: 'Equinócio de Outono: 21/03 - 08h' },
+    { valor: '3', label: 'Equinócio de Outono: 21/03 - 16h' },
+    { valor: '4', label: 'Solstício de Inverno: 21/06 - 09h' },
+    { valor: '5', label: 'Solstício de Inverno: 21/06 - 15h' },
+    { valor: '6', label: 'Equinócio de Primavera: 23/09 - 08h' },
+    { valor: '7', label: 'Equinócio de Primavera: 23/09 - 16h' },
+    { valor: '8', label: 'Solstício de Verão: 22/12 - 07h' },
+    { valor: '9', label: 'Solstício de Verão: 22/12 - 17h' }
+  ];
+  sliderMarcoAstronomico.addEventListener('input', function () {
+    const index = this.value;
+    labelMarco.textContent = opcoesMarco[index].label;
+    selMarcoAstronomico(opcoesMarco[index].valor);
+  });
+}
+
 
 //função de alternância entre mpas de Satelite Cesium e OSM
 function toggleMap() {
@@ -75,6 +159,7 @@ function Vista3d() {
     viewer.projectionPicker.viewModel.switchToPerspective();
 };
 
+//SEM USO: Teste para baixar um polígono já definido no código: sem uso atualmente
 async function baixarPoligono(viewer, filename = 'Edificio_BlocoDuplo.kml') {
     try {
         // 1. Exporta as entidades para uma string XML/KML
@@ -101,6 +186,57 @@ async function baixarPoligono(viewer, filename = 'Edificio_BlocoDuplo.kml') {
     }
 }
 
+//Download do poligono selecionado
+function baixarPoligonoSelecionado() {
+    // Verificar se uma entidade foi clicada
+    if (Cesium.defined(pickedObject) && pickedObject.id instanceof Cesium.Entity) {
+        var entity = pickedObject.id;
+        console.log("Entidade selecionada:", entity.name);
+
+        //alert("O polígono selecionado será baixado em formato KML.");
+        var resposta = confirm("Deseja baixar o polígono selecionado?");
+        if (resposta == true) {
+            console.log("Usuário optou por seguir.");
+            // Coloque aqui o código para seguir
+        } else {
+            console.log("Usuário cancelou.");
+            // Coloque aqui o código de cancelamento
+            return; // Sai da função se o usuário cancelar
+        }
+
+        // 2. Criar uma coleção temporária apenas com a entidade clicada
+        var entityCollection = new Cesium.EntityCollection();
+        entityCollection.add(entity);
+
+        // 3. Exportar a entidade para KML
+        Cesium.exportKml({
+            entities: entityCollection
+        }).then(function (result) {
+            // result.kml é uma string XML
+            downloadKml(entity.name || 'entidade', result.kml);
+        });
+    }
+}
+
+//Para baixar polígono selecionado: relacionada a função "baixarPoligonoSelecionado"
+function downloadKml(filename, kmlString) {
+    /* Esta parte comentada foi uma função sugerida pela ia, mas optei pela que já estava funcionando que é a que está logo abaixo.
+        var blob = new Blob([kmlContent], { type: 'application/vnd.google-earth.kml+xml' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename + '.kml';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    */
+    var blob = new Blob([kmlString], { type: 'application/vnd.google-earth.kml+xml' });
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name + '.kml';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
 
 function carregaEdificio(ArquivoCarregado) {
     const VarEdificio = Cesium.GeoJsonDataSource.load('https://urbanismopmro.github.io/Mapas/Cesium/Geometrias/Edificio_BlocoDuplo.geojson', {
@@ -236,6 +372,7 @@ function AlturaSoleira() {
             console.log('Total de polígonos alterados: ' + totalPoligonosAlterados);
         }
     }
+    CotaSoleiraAtual = parseFloat(document.getElementById('boxCotaSoleira').value);
 }
 
 function AlturaEdificacao() {
@@ -316,4 +453,4 @@ function exibirAlerta() {
     alert("Pare!");
 }
 
-export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono };
+export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono, pegaObjetoClicado, CotaSoleiraAtual, AtivaSliderMarcoAstronomico };
