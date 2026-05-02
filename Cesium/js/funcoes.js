@@ -124,6 +124,7 @@ function toggleMap() {
 //Determina o local de visualização inicial da câmera
 const LocalAlvo = {
     destination: Cesium.Cartesian3.fromDegrees(-41.934365, -22.554048, 1400),
+    duration: 0,
     orientation: {
         heading: Cesium.Math.toRadians(0.0),
         pitch: Cesium.Math.toRadians(-15.0),
