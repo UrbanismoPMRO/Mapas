@@ -1,3 +1,8 @@
+/*\\\\\\\\SOBRE/////////
+funções para medições
+código fornecido por  IA com adequações
+*/
+
 import { viewer } from './funcoes.js';
 
 // 2. Variáveis de estado

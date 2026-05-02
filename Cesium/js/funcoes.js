@@ -1,3 +1,7 @@
+/*\\\\\\\\SOBRE/////////
+acumular e organizar as funções executadas no mapa principal
+*/
+
 import { varPontoSelecionado } from "./config.js";
 import { handler } from "./index.js";
 import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
@@ -8,7 +12,9 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     projectionPicker: true,
     terrain: Cesium.Terrain.fromWorldTerrain(),
     shadows: true, // Habilita sombras para entidades/primitivos
+    //animation: false,
     terrainShadows: Cesium.ShadowMode.ENABLED // Habilita sombras no terreno
+
 });
 
 //inicializa a base OSM para visualização alternativa

@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+"name": "Lote8kml",
+"features": [
+{ "type": "Feature", "properties": { "name": "Lote 8", "descricao": "Polígono demonstrativo – clique para baixar como .dxf"}, "geometry": { "type": "Polygon", "coordinates": [ [ [ -41.9480242, -22.527405, 0.0 ], [ -41.9479103, -22.5273907, 0.0 ], [ -41.9479427, -22.5271575, 0.0 ], [ -41.948052, -22.52717, 0.0 ], [ -41.9480242, -22.527405, 0.0 ] ] ] } }
+]
+}

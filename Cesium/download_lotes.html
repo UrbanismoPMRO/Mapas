@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DXF ↔ GeoJSON · Cesium</title>
+
+  <!-- CesiumJS -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/download_lotes.css">
+
+</head>
+
+<body>
+
+  <header>
+    <div>
+      <table style="width:100%" class="fr-table-selection-hover" cellpadding="3" cellspacing="" border="0">
+        <tbody>
+          <tr>
+            <td><img src="../Configuracoes/Topo.png"></td>
+            <td>
+              <h1>🗺 Download DXF - Lotes</h1>
+              <p>Clique no polígono para baixar como .dxf.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <!-- <div id="upload-bar">
+  <label>
+    📂 Importar .dxf
+    <input type="file" id="dxf-input" accept=".dxf">
+  </label>
+  <span id="file-name">Nenhum arquivo carregado</span>
+  <button id="clear-btn" onclick="clearImported()">✕ Remover</button>
+</div> -->
+
+  <div id="cesiumContainer"></div>
+  <div id="map-tooltip"></div>
+  <div id="toast">⬇️ Download iniciado!</div>
+
+  <script type="module" src="js/ExportaImportaDXF.js"></script>
+  </script>
+</body>
+
+</html>

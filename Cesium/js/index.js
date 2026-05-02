@@ -1,3 +1,8 @@
+/*\\\\\\\\SOBRE/////////
+pricipais comandos de inicialização do mapa, bem como organizar os escutadores de ações do html e ligá-los a suas respectivas funções
+*/
+
+
 import { TokenCesium, varPontoSelecionado } from './config.js';
 import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono, pegaObjetoClicado, CotaSoleiraAtual, AtivaSliderMarcoAstronomico} from './funcoes.js';
 import { Medir, ApagarMedicao, DesligarMedir } from './Medir.js'

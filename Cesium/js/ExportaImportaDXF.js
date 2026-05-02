@@ -1,129 +1,14 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DXF ↔ GeoJSON · Cesium</title>
+/*\\\\\\\\SOBRE/////////
+Exportar poligonos do geojson dos lotes, transcrito para o arquivo geojsonData.js, para o formato .dxf
+Importar arquivos dxf feitos pelos profissionais para incluí-los no mapa principal para estudo de sombramento: aqui estão as funções para importação, que deverão ser importadas para a pagina de estudo de sombreamento para lá importar o dxf, convertendo-o para geojseon.
+O script aqui foi gerado pelo claude com diversas adaptações.
+o roriginal está no html "geojson-to-dxf-cesium-UTM_original.html", onde estão juntos script e html
+*/
 
-  <!-- CesiumJS -->
-  <script src="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js"></script>
-  <link href="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Widgets/widgets.css" rel="stylesheet"/>
-
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; height: 100vh; display: flex; flex-direction: column; }
-
-    header {
-      padding: 14px 20px;
-      background: #16213e;
-      border-bottom: 1px solid #0f3460;
-      display: flex; align-items: center; gap: 12px;
-    }
-    header h1 { font-size: 16px; font-weight: 600; color: #e94560; letter-spacing: 0.5px; }
-    header p  { font-size: 12px; color: #aaa; margin-top: 2px; }
-
-    #upload-bar {
-      background: #16213e;
-      border-bottom: 1px solid #0f3460;
-      padding: 10px 20px;
-      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    }
-    #upload-bar label {
-      display: flex; align-items: center; gap: 8px;
-      background: #0f3460; border: 1px dashed #e94560;
-      color: #e0e0e0; font-size: 13px; padding: 7px 14px;
-      border-radius: 6px; cursor: pointer; transition: background .2s;
-    }
-    #upload-bar label:hover { background: #1a2a50; }
-    #upload-bar input[type=file] { display: none; }
-    #file-name { font-size: 12px; color: #aaa; }
-    #clear-btn {
-      margin-left: auto; background: transparent; border: 1px solid #555;
-      color: #aaa; font-size: 12px; padding: 5px 12px; border-radius: 6px;
-      cursor: pointer; transition: all .2s; display: none;
-    }
-    #clear-btn:hover { border-color: #e94560; color: #e94560; }
-
-    #cesiumContainer { flex: 1; position: relative; }
-
-    /* Tooltip personalizado */
-    #map-tooltip {
-      position: fixed;
-      background: #16213e;
-      border: 1px solid #0f3460;
-      color: #e0e0e0;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      line-height: 1.6;
-      pointer-events: none;
-      z-index: 999;
-      display: none;
-      box-shadow: 0 4px 16px rgba(0,0,0,.5);
-      max-width: 240px;
-    }
-
-    #toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: #0f3460; color: #fff; padding: 10px 20px; border-radius: 8px;
-      font-size: 13px; box-shadow: 0 4px 20px rgba(0,0,0,.5);
-      transition: transform .3s ease; pointer-events: none; z-index: 9999;
-    }
-    #toast.show { transform: translateX(-50%) translateY(0); }
-
-    /* Oculta créditos e widgets desnecessários */
-    .cesium-widget-credits,
-    .cesium-credit-container { display: none !important; }
-  </style>
-</head>
-<body>
-
-<header>
-  <div>
-    <h1>🗺 DXF ↔ GeoJSON · Cesium</h1>
-    <p>Clique no polígono para baixar como .dxf · ou importe um .dxf para visualizar</p>
-  </div>
-</header>
-
-<div id="upload-bar">
-  <label>
-    📂 Importar .dxf
-    <input type="file" id="dxf-input" accept=".dxf">
-  </label>
-  <span id="file-name">Nenhum arquivo carregado</span>
-  <button id="clear-btn" onclick="clearImported()">✕ Remover</button>
-</div>
-
-<div id="cesiumContainer"></div>
-<div id="map-tooltip"></div>
-<div id="toast">⬇️ Download iniciado!</div>
-
-<script>
+import { geojsonData_Lotes } from "./geojsonData.js";
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. POLÍGONO GEOJSON (mesmo dado original)
 // ─────────────────────────────────────────────────────────────────────────────
-const geojsonData = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Área de Exemplo",
-        "descricao": "Polígono demonstrativo – clique para baixar como .dxf"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [[
-          [-43.1866, -22.9121],
-          [-43.1820, -22.9121],
-          [-43.1820, -22.9080],
-          [-43.1866, -22.9080],
-          [-43.1866, -22.9121]
-        ]]
-      }
-    }
-  ]
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 2. CESIUM INIT
@@ -147,13 +32,18 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
 
 // Imagery escura (CartoDB Dark equivalente)
 viewer.imageryLayers.removeAll();
+
+// Adiciona OSM de forma assíncrona
+viewer.imageryLayers.removeAll();
 viewer.imageryLayers.addImageryProvider(
   new Cesium.UrlTemplateImageryProvider({
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
     subdomains: ['a','b','c','d'],
     maximumLevel: 19,
   })
 );
+
+
 
 // Estilos de cor (equivalentes ao Leaflet style / hoverStyle)
 const COLOR_NORMAL  = Cesium.Color.fromCssColorString('#e94560');
@@ -195,8 +85,11 @@ function addGeoJSONLayer(geojson, fillColor, isImported) {
   for (const feature of geojson.features) {
     const geom  = feature.geometry;
     const props = feature.properties || {};
-    const name  = props.name || 'Polígono';
+    const lote = props.Lote || 'Lote não identificado.';
+    const name  = props.name || 'Nome não identificado.';
     const desc  = props.descricao || (props.layer ? 'Layer: ' + props.layer : '');
+    const loteamento = props.Loteamento || 'Loteamento não identificado.';
+    const quadra = props.Quadra || 'Quadra não identificada.'
 
     const rings = geom.type === 'Polygon'
       ? geom.coordinates
@@ -211,21 +104,49 @@ function addGeoJSONLayer(geojson, fillColor, isImported) {
       );
 
       // Polígono preenchido
-      const entity = viewer.entities.add({
-        polygon: {
-          hierarchy:       new Cesium.PolygonHierarchy(positions),
-          material:        fillColor.withAlpha(0.18),
-          outline:         true,
-          outlineColor:    fillColor,
-          outlineWidth:    2.5,
-          height:          0,
-          classificationType: Cesium.ClassificationType.TERRAIN,
-        },
-        // metadados acessíveis no pick
-        _meta: { feature, name, desc, isImported, fillColor }
-      });
+      // ... dentro do loop de criação da entity
+const entity = viewer.entities.add({
+  name: name,
+  lote: lote,
+  loteamento: loteamento,
+  quadra: quadra,
+  description: desc,
+  // Define a posição do label no centro do polígono
+  position: Cesium.BoundingSphere.fromPoints(
+    outerRing.map(([lon, lat]) => Cesium.Cartesian3.fromDegrees(lon, lat))
+  ).center,
+  
+  polygon: {
+    hierarchy: new Cesium.PolygonHierarchy(
+      outerRing.map(([lon, lat]) => Cesium.Cartesian3.fromDegrees(lon, lat))
+    ),
+    material: fillColor.withAlpha(0.18),
+    outline: true,
+    outlineColor: fillColor,
+    outlineWidth: 2.5,
+    height: 0,
+    classificationType: Cesium.ClassificationType.TERRAIN
+  },
+  
+  // ADICIONANDO A ETIQUETA:
+  label: {
+    text: lote,
+    font: '16px sans-serif',
+    fillColor: Cesium.Color.TEAL,
+    outlineColor: Cesium.Color.TURQUOISE,
+    outlineWidth: 2,
+    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND, // Gruda no chão
+    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+    pixelOffset: new Cesium.Cartesian2(0, 0), // Sobe um pouco a etiqueta
+    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 1000) // Sumir se estiver muito longe
+  },
+  
+  _meta: { feature, name, quadra, lote, loteamento, desc, isImported, fillColor }
+});
 
-      entityRegistry.push({ entity, feature, name, desc, isImported, fillColor });
+
+      entityRegistry.push({ feature, name, quadra, lote, loteamento, desc, isImported, fillColor });
       addedEntities.push(entity);
     }
   }
@@ -236,10 +157,18 @@ function addGeoJSONLayer(geojson, fillColor, isImported) {
 // ─────────────────────────────────────────────────────────────────────────────
 // 6. CARREGAR GEOJSON PADRÃO (equivalente ao geojsonLayer inicial)
 // ─────────────────────────────────────────────────────────────────────────────
-const defaultEntities = addGeoJSONLayer(geojsonData, COLOR_NORMAL, false);
+const defaultEntities = addGeoJSONLayer(geojsonData_Lotes, COLOR_NORMAL, false);
 
 // Fly to bounds do polígono padrão (equivalente ao map.fitBounds)
-viewer.flyTo(defaultEntities, { duration: 0 });
+//viewer.flyTo(defaultEntities, { duration: 0 });
+
+const offset = new Cesium.HeadingPitchRange(
+    Cesium.Math.toRadians(0), // Rotação
+    Cesium.Math.toRadians(-90), // Inclinação
+    30000                       // Distância (2km)
+);
+viewer.zoomTo(defaultEntities, offset);
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 7. INTERAÇÃO COM O MAPA (hover + click)
@@ -250,7 +179,17 @@ const canvas = viewer.scene.canvas;
 
 // MOUSEMOVE → tooltip + hover highlight
 canvas.addEventListener('mousemove', (e) => {
-  const picked = viewer.scene.pick(new Cesium.Cartesian2(e.clientX, e.clientY));
+  // 1. Calcula a posição correta relativa ao canvas
+  const rect = canvas.getBoundingClientRect();
+  const mousePosition = new Cesium.Cartesian2(
+    e.clientX - rect.left,
+    e.clientY - rect.top
+  );
+
+  // 2. Use a nova posição para o pick
+  const picked = viewer.scene.pick(mousePosition);
+
+
 
   if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id._meta) {
     const meta = picked.id._meta;
@@ -272,7 +211,7 @@ canvas.addEventListener('mousemove', (e) => {
     }
 
     // Tooltip (equivalente ao bindTooltip sticky)
-    const html = `<b>${meta.name}</b>${meta.desc ? '<br><small>' + meta.desc + '</small>' : ''}`;
+    const html = `<b>Lote: ${meta.lote}</b>${meta.quadra ? '<br><small>Quadra: ' + meta.quadra + '</small>' : ''}</b>${meta.loteamento ? '<br><small>Loteamento:  ' + meta.loteamento + '</small>' : ''}`;
     showTooltip(e.clientX, e.clientY, html);
 
   } else {
@@ -298,9 +237,9 @@ clickHandler.setInputAction((click) => {
   if (!Cesium.defined(picked) || !Cesium.defined(picked.id) || !picked.id._meta) return;
 
   const meta   = picked.id._meta;
-  const { zone, hemi } = downloadDXF(meta.feature.geometry, meta.name);
+  const { zone, hemi } = downloadDXF(meta.feature.geometry, "L" + meta.lote + "_Q" + meta.quadra + "_" + meta.loteamento);
   const action = meta.isImported ? 're-exportado' : 'baixado';
-  showToast(`✅ "${meta.name}" ${action} · UTM ${zone}${hemi}`);
+  showToast(`✅ Lote ${meta.lote}, quadra ${meta.quadra}, loteamento ${meta.loteamento} ${action} · UTM ${zone}${hemi}`);
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -704,6 +643,3 @@ function clearImported(silent = false) {
     showToast('🗑️ Camada removida.');
   }
 }
-</script>
-</body>
-</html>

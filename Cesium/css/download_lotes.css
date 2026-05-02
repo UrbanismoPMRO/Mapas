@@ -1,0 +1,65 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; height: 100%; display: flex; flex-direction: column}
+    // verificar aqui em cima a possibilidade de manter as configurações com os estilos a seguir (apos o height): display: flex; flex-direction: column; 
+
+    header {
+      padding: 14px 20px;
+      background: #16213e;
+      border-bottom: 1px solid #0f3460;
+      display: flex; align-items: center; gap: 12px;
+    }
+    header h1 { font-size: 16px; font-weight: 600; color: #e94560; letter-spacing: 0.5px; }
+    header p  { font-size: 12px; color: #aaa; margin-top: 2px; }
+
+    #upload-bar {
+      background: #16213e;
+      border-bottom: 1px solid #0f3460;
+      padding: 10px 20px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    #upload-bar label {
+      display: flex; align-items: center; gap: 8px;
+      background: #0f3460; border: 1px dashed #e94560;
+      color: #e0e0e0; font-size: 13px; padding: 7px 14px;
+      border-radius: 6px; cursor: pointer; transition: background .2s;
+    }
+    #upload-bar label:hover { background: #1a2a50; }
+    #upload-bar input[type=file] { display: none; }
+    #file-name { font-size: 12px; color: #aaa; }
+    #clear-btn {
+      margin-left: auto; background: transparent; border: 1px solid #555;
+      color: #aaa; font-size: 12px; padding: 5px 12px; border-radius: 6px;
+      cursor: pointer; transition: all .2s; display: none;
+    }
+    #clear-btn:hover { border-color: #e94560; color: #e94560; }
+
+    #cesiumContainer { flex: 1; position: relative; }
+
+    /* Tooltip personalizado */
+    #map-tooltip {
+      position: fixed;
+      background: #16213e;
+      border: 1px solid #0f3460;
+      color: #e0e0e0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.6;
+      pointer-events: none;
+      z-index: 999;
+      display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.5);
+      max-width: 240px;
+    }
+
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #0f3460; color: #fff; padding: 10px 20px; border-radius: 8px;
+      font-size: 13px; box-shadow: 0 4px 20px rgba(0,0,0,.5);
+      transition: transform .3s ease; pointer-events: none; z-index: 9999;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Oculta créditos e widgets desnecessários */
+    .cesium-widget-credits,
+    .cesium-credit-container { display: none !important; }

@@ -1,3 +1,7 @@
+/*\\\\\\\\SOBRE/////////
+alterar a visualização do mapa de acordo com o marco astronômico escolhido no slider
+*/
+
 import { viewer } from "./funcoes.js";
 
 function selMarcoAstronomico(opcao) {
