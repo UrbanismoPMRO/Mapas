@@ -2,9 +2,10 @@
 acumular e organizar as funções executadas no mapa principal
 */
 
-import { varPontoSelecionado, CotaSoleiraAtual } from "./config.js";
+import { varPontoSelecionado } from "./config.js";
 import { handler } from "./index.js";
 import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
+//import { varCotaSoleiraProjeto } from "./importaDXF.js";
 
 
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
@@ -28,6 +29,8 @@ osmLayer.show = false;
 
 
 let pickedObject;
+let CotaSoleiraAtual = 0;
+
 
 
 
@@ -72,6 +75,7 @@ function pegaObjetoClicado() {
             } else if (Cesium.defined(entity.polyline)) {
                 console.log("O objeto clicado é uma Polilinha (Polyline).");
             }
+            CotaSoleiraAtual = parseFloat(document.getElementById('boxCotaSoleira').value);
             var input = document.getElementById("boxAlturaEdif");
             // Proteção: só acessa extrudedHeight se for um polígono
             var alturaAtual = (entity.polygon && entity.polygon.extrudedHeight ? entity.polygon.extrudedHeight.getValue(Cesium.JulianDate.now()) : 0) - CotaSoleiraAtual;
@@ -490,5 +494,4 @@ function exibirAlerta() {
     alert("Pare!");
 }
 
-
-export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono, pegaObjetoClicado, AtivaSliderMarcoAstronomico, CotaSoleiraAtual };
+export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono, pegaObjetoClicado, AtivaSliderMarcoAstronomico };

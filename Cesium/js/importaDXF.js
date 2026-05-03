@@ -5,7 +5,6 @@ o roriginal está no html "geojson-to-dxf-cesium-UTM_original.html", onde estão
 */
 
 import { viewer } from "./funcoes.js"
-import { CotaSoleiraAtual } from "./config.js";
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. POLÍGONO GEOJSON (mesmo dado original)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -18,6 +17,7 @@ const COLOR_NORMAL = Cesium.Color.fromCssColorString('#e94560');
 const COLOR_HOVER = Cesium.Color.fromCssColorString('#ffd700');
 const COLOR_IMPORT = Cesium.Color.fromCssColorString('#00d4aa');
 const COLOR_IMP_HOV = Cesium.Color.fromCssColorString('#ffd700');
+let varCotaSoleiraProjeto = 0;
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. TOOLTIP
 // ─────────────────────────────────────────────────────────────────────────────
@@ -100,7 +100,7 @@ function addGeoJSONLayer(geojson, fillColor, isImported) {
           outlineWidth: 2.5,
           //height: 0,
           clampToGround: true,
-          extrudedHeight: Number(CotaSoleiraAtual) + Number(elev),
+          extrudedHeight: Number(varCotaSoleiraProjeto) + Number(elev),
           shadows: Cesium.ShadowMode.ENABLED,
           //classificationType: Cesium.ClassificationType.TERRAIN
         },
@@ -563,12 +563,12 @@ function clearImported(silent = false) {
 // ─────────────────────────────────────────────────────────────────────────────
 function pedirCotaSoeliraProjeto() {
   // O prompt(mensagem, valor_padrao) retorna o que o usuário digitar
-  CotaSoleiraAtual = 5;//Number(prompt("Determinar a cota de soelira do projeto"));
-  if (CotaSoleiraAtual != null && CotaSoleiraAtual != "") {
-    console.log(CotaSoleiraAtual);
+  varCotaSoleiraProjeto = Number(prompt("Determinar a cota de soelira do projeto"));
+  if (varCotaSoleiraProjeto != null && varCotaSoleiraProjeto != "") {
+    console.log(varCotaSoleiraProjeto);
     var input = document.getElementById("boxCotaSoleira");
-    input.value = CotaSoleiraAtual;
-    console.log(CotaSoleiraAtual)
+    input.value = varCotaSoleiraProjeto;
+    console.log(varCotaSoleiraProjeto)
     return true;
   } else {
     alert("Usuário cancelou ou não digitou nada. O arquivo .dxf não será carregado.");

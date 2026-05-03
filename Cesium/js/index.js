@@ -3,7 +3,7 @@ pricipais comandos de inicialização do mapa, bem como organizar os escutadores
 */
 
 
-import { TokenCesium, varPontoSelecionado, CotaSoleiraAtual, tanTan } from './config.js';
+import { TokenCesium, varPontoSelecionado } from './config.js';
 import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono, pegaObjetoClicado, AtivaSliderMarcoAstronomico } from './funcoes.js';
 import { Medir, ApagarMedicao, DesligarMedir } from './Medir.js'
 import { entityRegistry } from "./importaDXF.js"
@@ -270,5 +270,5 @@ document.getElementById('btnCarregaEdificacao').addEventListener('click', () => 
 });
 */
 document.getElementById('btnTeste').addEventListener('click', () => {
-  tanTan = 6;
+//  tanTan = 6;
 });
