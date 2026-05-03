@@ -174,8 +174,8 @@ canvas.addEventListener('mousemove', (e) => {
       hoveredEntity.polygon.outlineColor = new Cesium.CallbackProperty(() => hoverColor, false);
       canvas.style.cursor = 'pointer';
     }
-
-    /*aqui a função mostra o tooltip, porém como não há por enquanto nada específico a 
+    /*
+    //aqui a função mostra o tooltip, porém como não há por enquanto nada específico a 
     //indicar sobre os polígonos, então mantive desativado. caso ativa, descomentar também a linha com a função "hideTooltip" e "moveTooltip" na seção depois do else deste mesmo if.
     // Tooltip (equivalente ao bindTooltip sticky)
     const html = `<b>Lote: ${meta.lote}</b>${meta.quadra ? '<br><small>Quadra: ' + meta.quadra + '</small>' : ''}</b>${meta.loteamento ? '<br><small>Loteamento:  ' + meta.loteamento + '</small>' : ''}`;

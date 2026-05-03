@@ -179,7 +179,7 @@
     padding: 5px 5px;
 }
 
-#frmControles {
+#frmMarcoAstronomico {
     position: absolute;
     top: 170px;
     left: 10px;
@@ -205,6 +205,38 @@
     font-family: 'Courier New', Courier, monospace;
     font-size: 14px;
     width: fit-content;
+}
+
+#frmControles {
+  position: fixed;
+      background: #16213e;
+      border: 1px solid #0f3460;
+      color: #e0e0e0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.6;
+      /* pointer-events: none; */
+      z-index: 999;
+      display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.5);
+      max-width: 240px;
+}
+
+#map-tooltip {
+  position: fixed;
+      background: #16213e;
+      border: 1px solid #0f3460;
+      color: #e0e0e0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.6;
+      /* pointer-events: none; */
+      z-index: 999;
+      display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.5);
+      max-width: 240px;
 }
 
 #frmDownloadLotes {

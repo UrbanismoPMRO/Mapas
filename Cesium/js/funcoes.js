@@ -27,17 +27,24 @@ const osmLayer = viewer.imageryLayers.addImageryProvider(
 );
 osmLayer.show = false;
 
-
 let pickedObject;
 let CotaSoleiraAtual = 0;
 
-
-
-
-
 //######################################################
+const tooltip = document.getElementById('frmControles');
 
-
+function showTooltip(x, y) {//, html) {
+    //tooltip.innerHTML = html;
+    tooltip.style.display = 'block';
+    moveTooltip(x, y);
+}
+function moveTooltip(x, y) {
+    tooltip.style.left = (x + 16) + 'px';
+    tooltip.style.top = (y + 16) + 'px';
+}
+function hideTooltip() {
+    tooltip.style.display = 'none';
+}
 //#########################################################
 
 // Criar o manipulador de eventos de clique
@@ -45,6 +52,23 @@ function pegaObjetoClicado() {
     var mousePosition;
     var varCartesiano;
     var varCartografico;
+
+    const canvasClick = viewer.scene.canvas;
+    canvasClick.addEventListener('click', (e) => {
+        const rect = canvasClick.getBoundingClientRect();
+        const mousePosition = new Cesium.Cartesian2(
+            e.clientX - rect.left,
+            e.clientY - rect.top
+        )
+
+        const picked = viewer.scene.pick(mousePosition);
+        if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id._meta) {
+            const meta = picked.id._meta;
+            showTooltip(e.clientX, e.clientY);//, html);
+        } else {
+            hideTooltip();
+        }
+    });
     // 4. Capturar a posição do clique (2D - pixeis)
     handler.setInputAction(function (click) {
         // 4. Selecionar o objeto clicado
