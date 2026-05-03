@@ -11,3 +11,6 @@ export let varPontoSelecionado = {
     varLatitude: -22.479147,
     varAltura: 300
 };
+
+export let CotaSoleiraAtual; //armazena a cota da soleira depois de ser alterada, para que a função de alterar a cota de soleira possa usar esse valor atualizado para calcular a nova altura do edifício, caso o usuário queira alterar a cota de soleira mais de uma vez.
+export let tanTan;

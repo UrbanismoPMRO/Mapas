@@ -5,6 +5,7 @@ o roriginal está no html "geojson-to-dxf-cesium-UTM_original.html", onde estão
 */
 
 import { viewer } from "./funcoes.js"
+import { CotaSoleiraAtual } from "./config.js";
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. POLÍGONO GEOJSON (mesmo dado original)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -17,7 +18,6 @@ const COLOR_NORMAL = Cesium.Color.fromCssColorString('#e94560');
 const COLOR_HOVER = Cesium.Color.fromCssColorString('#ffd700');
 const COLOR_IMPORT = Cesium.Color.fromCssColorString('#00d4aa');
 const COLOR_IMP_HOV = Cesium.Color.fromCssColorString('#ffd700');
-
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. TOOLTIP
 // ─────────────────────────────────────────────────────────────────────────────
@@ -40,7 +40,7 @@ function hideTooltip() {
 // 4. REGISTRO DE ENTIDADES (para rastrear grupo → metadados)
 // ─────────────────────────────────────────────────────────────────────────────
 // Cada entrada: { entity, feature, isImported, outlineEntity }
-const entityRegistry = [];
+export const entityRegistry = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 5. ADICIONAR GEOJSON AO CESIUM
@@ -53,6 +53,8 @@ function addGeoJSONLayer(geojson, fillColor, isImported) {
     const geom = feature.geometry;
     const props = feature.properties || {};
     const lote = props.Lote || 'Lote não identificado.';
+    const layer = props.layer || 'Layer não identificado.';
+    const elev = props.elev;// || 'Elev não identificado.';
     const name = props.name || 'Nome não identificado.';
     const desc = props.descricao || (props.layer ? 'Layer: ' + props.layer : '');
     const loteamento = props.Loteamento || 'Loteamento não identificado.';
@@ -75,6 +77,9 @@ function addGeoJSONLayer(geojson, fillColor, isImported) {
       const entity = viewer.entities.add({
         name: name,
         lote: lote,
+        layer: layer,
+        elev: elev,
+        //elevN: elevN,
         loteamento: loteamento,
         quadra: quadra,
         description: desc,
@@ -95,14 +100,15 @@ function addGeoJSONLayer(geojson, fillColor, isImported) {
           outlineWidth: 2.5,
           //height: 0,
           clampToGround: true,
+          extrudedHeight: Number(CotaSoleiraAtual) + Number(elev),
           shadows: Cesium.ShadowMode.ENABLED,
           //classificationType: Cesium.ClassificationType.TERRAIN
         },
 
-/*tirar esse comentário para fazer o codigo mostrar etiqueta das entidades
+        //tirar esse comentário para fazer o codigo mostrar etiqueta das entidades
         // ADICIONANDO A ETIQUETA:
         label: {
-          text: lote,
+          text: elev,
           font: '16px sans-serif',
           fillColor: Cesium.Color.TEAL,
           outlineColor: Cesium.Color.TURQUOISE,
@@ -113,14 +119,16 @@ function addGeoJSONLayer(geojson, fillColor, isImported) {
           pixelOffset: new Cesium.Cartesian2(0, 0), // Sobe um pouco a etiqueta
           distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 1000) // Sumir se estiver muito longe
         },
-*/
-        _meta: { feature, name, quadra, lote, loteamento, desc, isImported, fillColor }
+
+        _meta: { feature, name, quadra, lote, elev, layer, loteamento, desc, isImported, fillColor }
       });
 
 
-      entityRegistry.push({ feature, name, quadra, lote, loteamento, desc, isImported, fillColor });
+      entityRegistry.push({ feature, name, quadra, lote, elev, layer, loteamento, desc, isImported, fillColor });
       addedEntities.push(entity);
     }
+
+    console.log('Elevation: ' + elev);
   }
 
   return addedEntities;
@@ -156,7 +164,7 @@ canvas.addEventListener('mousemove', (e) => {
       // Restaura entidade anterior
       if (hoveredEntity && hoveredEntity._meta) {
         const prev = hoveredEntity._meta;
-        hoveredEntity.polygon.material = prev.fillColor.withAlpha(0.18);
+        hoveredEntity.polygon.material = prev.fillColor.withAlpha(1);
         hoveredEntity.polygon.outlineColor = new Cesium.CallbackProperty(() => prev.fillColor, false);
       }
       hoveredEntity = picked.id;
@@ -183,7 +191,7 @@ canvas.addEventListener('mousemove', (e) => {
       hoveredEntity = null;
       canvas.style.cursor = 'default';
     }
-    
+
     /*descomentar caso habilite a função "showTooltip" que está logo aqui acima na seçaõ deste if.
     hideTooltip();
     */
@@ -364,10 +372,12 @@ function parseDXF(text) {
       const pts = [];
       let closed = false;
       let layer = '0';
+      let elev = '0'; //daniel
       i++;
       while (i < tokens.length && tokens[i][0] !== 0) {
         const [c, v] = tokens[i];
         if (c === 8) layer = v;
+        if (c === 38) elev = v; //daniel
         if (c === 70) closed = (parseInt(v, 10) & 1) === 1;
         if (c === 10) pts.push([parseFloat(v), null]);
         if (c === 20 && pts.length > 0) pts[pts.length - 1][1] = parseFloat(v);
@@ -376,7 +386,7 @@ function parseDXF(text) {
       const valid = pts.filter(p => p[1] !== null);
       if (valid.length >= 3) {
         if (closed) valid.push([...valid[0]]);
-        polygons.push({ pts: valid, layer });
+        polygons.push({ pts: valid, layer, elev });
       }
       continue;
     }
@@ -386,10 +396,12 @@ function parseDXF(text) {
       const pts = [];
       let closed = false;
       let layer = '0';
+      let elev = '0'; //daniel
       i++;
       while (i < tokens.length && tokens[i][0] !== 0) {
         const [c, v] = tokens[i];
         if (c === 8) layer = v;
+        if (c === 38) elev = v; //daniel
         if (c === 70) closed = (parseInt(v, 10) & 1) === 1;
         i++;
       }
@@ -412,7 +424,7 @@ function parseDXF(text) {
       }
       if (pts.length >= 3) {
         if (closed) pts.push([...pts[0]]);
-        polygons.push({ pts, layer });
+        polygons.push({ pts, layer, elev });
       }
       continue;
     }
@@ -459,6 +471,8 @@ function dxfPolygonsToGeoJSON(polygons, filename) {
         properties: {
           name: `${filename} — polígono ${idx + 1}`,
           layer: poly.layer,
+          elev: poly.elev,
+          //elevN: poly.38
           utm_zone: isUTM ? `${detectedZone}${detectedHemi}` : null,
           converted: isUTM,
         },
@@ -482,6 +496,9 @@ document.getElementById('dxf-input').addEventListener('change', function () {
   const file = this.files[0];
   console.log('primeiro passo');
   if (!file) return;
+
+  if (pedirCotaSoeliraProjeto() === false) return;
+  
 
   const reader = new FileReader();
   reader.onload = function (e) {
@@ -538,5 +555,23 @@ function clearImported(silent = false) {
     document.getElementById('file-name').textContent = 'Nenhum arquivo carregado';
     document.getElementById('clear-btn').style.display = 'none';
     showToast('🗑️ Camada removida.');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 13. Pedir entrada da altura da cota de soleira
+// ─────────────────────────────────────────────────────────────────────────────
+function pedirCotaSoeliraProjeto() {
+  // O prompt(mensagem, valor_padrao) retorna o que o usuário digitar
+  CotaSoleiraAtual = 5;//Number(prompt("Determinar a cota de soelira do projeto"));
+  if (CotaSoleiraAtual != null && CotaSoleiraAtual != "") {
+    console.log(CotaSoleiraAtual);
+    var input = document.getElementById("boxCotaSoleira");
+    input.value = CotaSoleiraAtual;
+    console.log(CotaSoleiraAtual)
+    return true;
+  } else {
+    alert("Usuário cancelou ou não digitou nada. O arquivo .dxf não será carregado.");
+    return false;
   }
 }

@@ -3,9 +3,10 @@ pricipais comandos de inicialização do mapa, bem como organizar os escutadores
 */
 
 
-import { TokenCesium, varPontoSelecionado } from './config.js';
-import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono, pegaObjetoClicado, CotaSoleiraAtual, AtivaSliderMarcoAstronomico} from './funcoes.js';
+import { TokenCesium, varPontoSelecionado, CotaSoleiraAtual, tanTan } from './config.js';
+import { LocalAlvo, carregarLimite, carregaEdificio, carregaLoteamento, viewer, exibirAlerta, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono, pegaObjetoClicado, AtivaSliderMarcoAstronomico } from './funcoes.js';
 import { Medir, ApagarMedicao, DesligarMedir } from './Medir.js'
+import { entityRegistry } from "./importaDXF.js"
 // Your access token can be found at: https://ion.cesium.com/tokens.
 // This is the default access token from your ion account
 
@@ -55,13 +56,14 @@ document.getElementById('btn3D').addEventListener('click', () => {
 
 //Menu de Marcos Astronomicos
 document.getElementById('sliderMarcoAstronomico').addEventListener('change', (event) => {
-AtivaSliderMarcoAstronomico();
+  AtivaSliderMarcoAstronomico();
 });
 
 //Atribui Extrusão de acrodo com o valor da caixa de texto
 document.getElementById('boxAlturaEdif').addEventListener('change', (event) => {
   AlturaEdificacao();
 });
+
 document.getElementById('boxCotaSoleira').addEventListener('change', (event) => {
   AlturaSoleira();
   //CotaSoleiraAtual = parseFloat(document.getElementById('boxCotaSoleira').value);
@@ -139,119 +141,120 @@ document.getElementById('inputArquivo').addEventListener('change', (event) => {
                 }
               });
               viewer.zoomTo(dataSource);
-            }          });
-        //fim enxerto para converter linhas em poligonos
-
-
-
-        for (let i = 0; i < entities.length; i++) {
-          const entity = entities[i];
-          if (entity.polygon) {
-            entity.polygon.outline = true;
-            entity.polygon.outlineColor = Cesium.Color.BLACK;
-            //entity.polygon.material = Cesium.Color.BLUE;
-            entity.polygon.shadows = Cesium.ShadowMode.ENABLED;
-            switch (i) {
-              case 0:
-                entity.polygon.material = Cesium.Color.BLUE; // Cor preenchimento
-                break;
-              case 1:
-                entity.polygon.material = Cesium.Color.RED; // Cor preenchimento
-                break;
-              case 2:
-                entity.polygon.material = Cesium.Color.GREEN; // Cor preenchimento
-                break;
-              case 3:
-                entity.polygon.material = Cesium.Color.ORANGE; // Cor preenchimento
-                break;
-              case 4:
-                entity.polygon.material = Cesium.Color.WHITE; // Cor preenchimento
-                break;
-              case 5:
-                entity.polygon.material = Cesium.Color.BLACK; // Cor preenchimento
-                break;
-              default:
-                entity.polygon.material = Cesium.Color.YELLOW; // Cor preenchimento
             }
-          }
-          // if (entity.polyline) {
-          //   entity.polyline.width = 2;
-          //   entity.polyline.clampToGround = true;
-          //   alert("A geometria carregada não é um polígono, assim não poderá ser extrudada. Apenas polígonos podem ser extrudados, ou seja, elevados a uma altura específica. Linhas e pontos não possuem área para serem extrudados, por isso não terão essa funcionalidade disponível.");
+          });
+          //fim enxerto para converter linhas em poligonos
 
-          // }
-        }
-      })/*.catch(function (erro) {
+
+
+          for (let i = 0; i < entities.length; i++) {
+            const entity = entities[i];
+            if (entity.polygon) {
+              entity.polygon.outline = true;
+              entity.polygon.outlineColor = Cesium.Color.BLACK;
+              //entity.polygon.material = Cesium.Color.BLUE;
+              entity.polygon.shadows = Cesium.ShadowMode.ENABLED;
+              switch (i) {
+                case 0:
+                  entity.polygon.material = Cesium.Color.BLUE; // Cor preenchimento
+                  break;
+                case 1:
+                  entity.polygon.material = Cesium.Color.RED; // Cor preenchimento
+                  break;
+                case 2:
+                  entity.polygon.material = Cesium.Color.GREEN; // Cor preenchimento
+                  break;
+                case 3:
+                  entity.polygon.material = Cesium.Color.ORANGE; // Cor preenchimento
+                  break;
+                case 4:
+                  entity.polygon.material = Cesium.Color.WHITE; // Cor preenchimento
+                  break;
+                case 5:
+                  entity.polygon.material = Cesium.Color.BLACK; // Cor preenchimento
+                  break;
+                default:
+                  entity.polygon.material = Cesium.Color.YELLOW; // Cor preenchimento
+              }
+            }
+            // if (entity.polyline) {
+            //   entity.polyline.width = 2;
+            //   entity.polyline.clampToGround = true;
+            //   alert("A geometria carregada não é um polígono, assim não poderá ser extrudada. Apenas polígonos podem ser extrudados, ou seja, elevados a uma altura específica. Linhas e pontos não possuem área para serem extrudados, por isso não terão essa funcionalidade disponível.");
+
+            // }
+          }
+        })/*.catch(function (erro) {
           alert('Erro ao carregar arquivo KML: ' + erro);
         });*/
       };
-leitor.readAsText(arquivo);
+      leitor.readAsText(arquivo);
 
     } else if (extensao === 'geojson' || extensao === 'json') {
-  // Carregar arquivo GeoJSON
-  const leitor = new FileReader();
-  leitor.onload = function (e) {
-    const conteudo = e.target.result;
+      // Carregar arquivo GeoJSON
+      const leitor = new FileReader();
+      leitor.onload = function (e) {
+        const conteudo = e.target.result;
 
-    // Converter string para objeto JSON
-    const dados = JSON.parse(conteudo);
+        // Converter string para objeto JSON
+        const dados = JSON.parse(conteudo);
 
-    // Carregar no Cesium
-    Cesium.GeoJsonDataSource.load(dados, {
-      stroke: Cesium.Color.YELLOW,
-      fill: Cesium.Color.YELLOW,
-      strokeWidth: 2,
-      clampToGround: true,
-      shadows: true
-    }).then(function (dataSource) {
-      viewer.dataSources.add(dataSource);
-      viewer.zoomTo(dataSource);
-      console.log('Arquivo GeoJSON carregado com sucesso!');
-      const entities = dataSource.entities.values;
-      //dá cor única para cada bloco da edificação
-      for (let i = 0; i < entities.length; i++) {
-        const entity = entities[i];
-        if (entity.polygon) {
-          entity.polygon.outline = true;
-          entity.polygon.outlineColor = Cesium.Color.BLACK;
-          entity.polygon.shadows = Cesium.ShadowMode.ENABLED;
-          switch (i) {
-            case 0:
-              entity.polygon.material = Cesium.Color.BLUE; // Cor preenchimento
-              break;
-            case 1:
-              entity.polygon.material = Cesium.Color.RED; // Cor preenchimento
-              break;
-            case 2:
-              entity.polygon.material = Cesium.Color.GREEN; // Cor preenchimento
-              break;
-            case 3:
-              entity.polygon.material = Cesium.Color.ORANGE; // Cor preenchimento
-              break;
-            case 4:
-              entity.polygon.material = Cesium.Color.WHITE; // Cor preenchimento
-              break;
-            case 5:
-              entity.polygon.material = Cesium.Color.BLACK; // Cor preenchimento
-              break;
-            default:
-              entity.polygon.material = Cesium.Color.YELLOW; // Cor preenchimento
+        // Carregar no Cesium
+        Cesium.GeoJsonDataSource.load(dados, {
+          stroke: Cesium.Color.YELLOW,
+          fill: Cesium.Color.YELLOW,
+          strokeWidth: 2,
+          clampToGround: true,
+          shadows: true
+        }).then(function (dataSource) {
+          viewer.dataSources.add(dataSource);
+          viewer.zoomTo(dataSource);
+          console.log('Arquivo GeoJSON carregado com sucesso!');
+          const entities = dataSource.entities.values;
+          //dá cor única para cada bloco da edificação
+          for (let i = 0; i < entities.length; i++) {
+            const entity = entities[i];
+            if (entity.polygon) {
+              entity.polygon.outline = true;
+              entity.polygon.outlineColor = Cesium.Color.BLACK;
+              entity.polygon.shadows = Cesium.ShadowMode.ENABLED;
+              switch (i) {
+                case 0:
+                  entity.polygon.material = Cesium.Color.BLUE; // Cor preenchimento
+                  break;
+                case 1:
+                  entity.polygon.material = Cesium.Color.RED; // Cor preenchimento
+                  break;
+                case 2:
+                  entity.polygon.material = Cesium.Color.GREEN; // Cor preenchimento
+                  break;
+                case 3:
+                  entity.polygon.material = Cesium.Color.ORANGE; // Cor preenchimento
+                  break;
+                case 4:
+                  entity.polygon.material = Cesium.Color.WHITE; // Cor preenchimento
+                  break;
+                case 5:
+                  entity.polygon.material = Cesium.Color.BLACK; // Cor preenchimento
+                  break;
+                default:
+                  entity.polygon.material = Cesium.Color.YELLOW; // Cor preenchimento
+              }
+            }
+            if (entity.polyline) {
+              entity.polyline.width = 2;
+              entity.polyline.clampToGround = true;
+              alert("A geometria carregada não é um polígono, assim não poderá ser extrudada. Apenas polígonos podem ser extrudados, ou seja, elevados a uma altura específica. Linhas e pontos não possuem área para serem extrudados, por isso não terão essa funcionalidade disponível.");
+            }
           }
-        }
-        if (entity.polyline) {
-          entity.polyline.width = 2;
-          entity.polyline.clampToGround = true;
-          alert("A geometria carregada não é um polígono, assim não poderá ser extrudada. Apenas polígonos podem ser extrudados, ou seja, elevados a uma altura específica. Linhas e pontos não possuem área para serem extrudados, por isso não terão essa funcionalidade disponível.");
-        }
-      }
-    }).catch(function (erro) {
-      alert('Erro ao carregar arquivo GeoJSON: ' + erro);
-    });
-  };
-  leitor.readAsText(arquivo);
-} else {
-  alert('Formato de arquivo não suportado. Use .kml ou .geojson');
-}
+        }).catch(function (erro) {
+          alert('Erro ao carregar arquivo GeoJSON: ' + erro);
+        });
+      };
+      leitor.readAsText(arquivo);
+    } else {
+      alert('Formato de arquivo não suportado. Use .kml ou .geojson');
+    }
   }
 });
 
@@ -265,10 +268,7 @@ document.getElementById('btnCarregarModelo3D').addEventListener('click', () => {
 document.getElementById('btnCarregaEdificacao').addEventListener('click', () => {
   carregaEdificio();
 });
-
-document.getElementById('btnTeste').addEventListener('click', () => {
-  //carregaRotulo();
-  baixarPoligono(viewer, 'exportacao_cesium.kml');
-});
-
 */
+document.getElementById('btnTeste').addEventListener('click', () => {
+  tanTan = 6;
+});

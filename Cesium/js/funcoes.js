@@ -2,7 +2,7 @@
 acumular e organizar as funções executadas no mapa principal
 */
 
-import { varPontoSelecionado } from "./config.js";
+import { varPontoSelecionado, CotaSoleiraAtual } from "./config.js";
 import { handler } from "./index.js";
 import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
 
@@ -26,8 +26,10 @@ const osmLayer = viewer.imageryLayers.addImageryProvider(
 );
 osmLayer.show = false;
 
-let CotaSoleiraAtual = 0; //armazena a cota da soleira depois de ser alterada, para que a função de alterar a cota de soleira possa usar esse valor atualizado para calcular a nova altura do edifício, caso o usuário queira alterar a cota de soleira mais de uma vez.
+
 let pickedObject;
+
+
 
 
 //######################################################
@@ -91,26 +93,26 @@ function pegaObjetoClicado() {
 
 //MarcosAstronõmicos
 function AtivaSliderMarcoAstronomico() {
-  // Slider de Marcos Astronômicos
-  const sliderMarco = document.getElementById('sliderMarcoastronomico');
-  const labelMarco = document.getElementById('labelMarco');
-  const opcoesMarco = [
-    { valor: '', label: 'Selecione' },
-    { valor: '1', label: 'Hora Atual' },
-    { valor: '2', label: 'Equinócio de Outono: 21/03 - 08h' },
-    { valor: '3', label: 'Equinócio de Outono: 21/03 - 16h' },
-    { valor: '4', label: 'Solstício de Inverno: 21/06 - 09h' },
-    { valor: '5', label: 'Solstício de Inverno: 21/06 - 15h' },
-    { valor: '6', label: 'Equinócio de Primavera: 23/09 - 08h' },
-    { valor: '7', label: 'Equinócio de Primavera: 23/09 - 16h' },
-    { valor: '8', label: 'Solstício de Verão: 22/12 - 07h' },
-    { valor: '9', label: 'Solstício de Verão: 22/12 - 17h' }
-  ];
-  sliderMarcoAstronomico.addEventListener('input', function () {
-    const index = this.value;
-    labelMarco.textContent = opcoesMarco[index].label;
-    selMarcoAstronomico(opcoesMarco[index].valor);
-  });
+    // Slider de Marcos Astronômicos
+    const sliderMarco = document.getElementById('sliderMarcoastronomico');
+    const labelMarco = document.getElementById('labelMarco');
+    const opcoesMarco = [
+        { valor: '', label: 'Selecione' },
+        { valor: '1', label: 'Hora Atual' },
+        { valor: '2', label: 'Equinócio de Outono: 21/03 - 08h' },
+        { valor: '3', label: 'Equinócio de Outono: 21/03 - 16h' },
+        { valor: '4', label: 'Solstício de Inverno: 21/06 - 09h' },
+        { valor: '5', label: 'Solstício de Inverno: 21/06 - 15h' },
+        { valor: '6', label: 'Equinócio de Primavera: 23/09 - 08h' },
+        { valor: '7', label: 'Equinócio de Primavera: 23/09 - 16h' },
+        { valor: '8', label: 'Solstício de Verão: 22/12 - 07h' },
+        { valor: '9', label: 'Solstício de Verão: 22/12 - 17h' }
+    ];
+    sliderMarcoAstronomico.addEventListener('input', function () {
+        const index = this.value;
+        labelMarco.textContent = opcoesMarco[index].label;
+        selMarcoAstronomico(opcoesMarco[index].valor);
+    });
 }
 
 
@@ -349,6 +351,31 @@ function AlturaSoleira() {
     // Função para alterar a altura de TODOS os polígonos
     let totalPoligonosAlterados = 0;
     const CotaSoleira = parseFloat(document.getElementById("boxCotaSoleira").value); //pega o valor da cota de soleira no formulário
+
+    //iterar para todos as entidades inseridas pelo arquivo dxf importado (em viewer.entities)
+    const entities = viewer.entities.values;
+    //console.log(entities.length)
+    for (let i = 0; i < entities.length; i++) {
+        const entity = entities[i]
+        if (entity.polygon) {
+            var AlturaAtualSemSoleira = 0;
+            const AlturaAtual = entity.polygon.extrudedHeight || 0; // Obtém a altura atual (ou 0 se não estiver definida)
+            console.log('Altura Atual: ' + AlturaAtual)
+            if ((AlturaAtual - CotaSoleiraAtual) <= 0) {
+                AlturaAtualSemSoleira = 0;
+                console.log('<=0');
+            } else {
+                AlturaAtualSemSoleira = AlturaAtual - CotaSoleiraAtual; // Calcula a altura atual sem a cota de soleira
+                console.log('Altura atual sem soleira: ' + AlturaAtualSemSoleira)
+                console.log('>0');
+            }
+            const AlturaFinal = CotaSoleira + AlturaAtualSemSoleira; // Calcula a nova altura somando a cota de soleira com a altura atual do edifício   
+            entity.polygon.extrudedHeight = AlturaFinal;
+            console.log('altura final: ' + AlturaFinal);
+        }
+    }
+    //fim iteração entidaddes do dxf
+
     // Iterar sobre todos os dataSources
     for (let i = 0; i < viewer.dataSources.length; i++) {
         const dataSource = viewer.dataSources.get(i);
@@ -371,7 +398,6 @@ function AlturaSoleira() {
                 totalPoligonosAlterados++;
                 console.log('altura final: ' + AlturaFinal);
             }
-
             // if (entity.polygon) {
             //     const AlturaAtual = entity.polygon.extrudedHeight || 0; // Obtém a altura atual (ou 0 se não estiver definida)
             //     const AlturaAtualSemSoleira = AlturaAtual - CotaSoleiraAtual; // Calcula a altura atual sem a cota de soleira
@@ -380,8 +406,6 @@ function AlturaSoleira() {
             //     totalPoligonosAlterados++;
             //     console.log('altura final: ' + AlturaFinal);
             // }
-
-
             console.log('Total de polígonos alterados: ' + totalPoligonosAlterados);
         }
     }
@@ -466,4 +490,5 @@ function exibirAlerta() {
     alert("Pare!");
 }
 
-export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono, pegaObjetoClicado, CotaSoleiraAtual, AtivaSliderMarcoAstronomico };
+
+export { LocalAlvo, carregarLimite, exibirAlerta, viewer, carregaEdificio, carregaLoteamento, carregarModelo3D, AlturaEdificacao, AlturaSoleira, carregaRotulo, VistaSuperior, toggleMap, Vista3d, baixarPoligono, pegaObjetoClicado, AtivaSliderMarcoAstronomico, CotaSoleiraAtual };
