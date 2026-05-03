@@ -26,6 +26,19 @@ viewer.timeline.currentTime = new Cesium.JulianDate(2461397.2083333335)
 viewer.timeline.updateFromClock();
 viewer.scene.globe.depthTestAgainstTerrain = true; //desativa teste de profundidade para que o aplicativo não verifique o solo, isso serve para que a linha de limite não fique sob o solo.
 
+//$4-configurações temporarias remover todas para voltar ao original
+  // Imagery light (CartoDB light equivalente)
+  //viewer.imageryLayers.removeAll();
+  viewer.imageryLayers.addImageryProvider(
+    new Cesium.UrlTemplateImageryProvider({
+      url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+      subdomains: ['a','b','c','d'],
+      maximumLevel: 19,
+    })
+  );
+//$4-
+
+
 //Carrega  o modelo de terreno do Cesium Ion e o openstreemap como alternativas para visualização
 
 

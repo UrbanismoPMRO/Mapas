@@ -563,8 +563,8 @@ function clearImported(silent = false) {
 // ─────────────────────────────────────────────────────────────────────────────
 function pedirCotaSoeliraProjeto() {
   // O prompt(mensagem, valor_padrao) retorna o que o usuário digitar
-  varCotaSoleiraProjeto = Number(prompt("Determinar a cota de soelira do projeto"));
-  if (varCotaSoleiraProjeto != null && varCotaSoleiraProjeto != "") {
+  varCotaSoleiraProjeto = Number(prompt("Determinar a cota de soelira do projeto. (use . para decimal)"));
+  if (varCotaSoleiraProjeto != null && varCotaSoleiraProjeto != "" || varCotaSoleiraProjeto === 0) {
     console.log(varCotaSoleiraProjeto);
     var input = document.getElementById("boxCotaSoleira");
     input.value = varCotaSoleiraProjeto;

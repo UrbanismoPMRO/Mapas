@@ -1,9 +1,11 @@
 #btnVistaSuperior {
-    position: absolute;
-    top: 60px;
-    left: 10px;
-    padding: 10px 20px;
+position: absolute;
+    top: 10px;
+    left: 1px;
+    width: 30px;
+    padding: 4px 4px;
     background-color: #007bff;
+    background: none;
     color: white;
     border: none;
     border-radius: 5px;
@@ -12,11 +14,13 @@
 }
 
 #btn3D {
-    position: absolute;
-    top: 60px;
-    left: 145px;
-    padding: 10px 20px;
+position: absolute;
+    top: 46px;
+    left: 1px;
+    width: 30px;
+    padding: 4px 4px;
     background-color: #007bff;
+    background: none;
     color: white;
     border: none;
     border-radius: 5px;
@@ -38,11 +42,13 @@
 }
 
 #btnCarregaArquivo {
-    position: absolute;
-    top: 130px;
-    left: 10px;
-    padding: 10px 20px;
+position: absolute;
+    top: 82px;
+    left: 1px;
+    width: 30px;
+    padding: 4px 4px;
     background-color: #007bff;
+    background: none;
     color: white;
     border: none;
     border-radius: 5px;
@@ -50,14 +56,15 @@
     z-index: 999;
 }
 
-
-
+/*Botões para medição*/
 #btnMedir {
     position: absolute;
-    top: 360px;
-    left: 10px;
-    padding: 10px 20px;
+    top: 10px;
+    left: 1px;
+    width: 30px;
+    padding: 4px 4px;
     background-color: #007bff;
+    background: none;
     color: white;
     border: none;
     border-radius: 5px;
@@ -67,10 +74,12 @@
 
 #btnDesligarMedir {
     position: absolute;
-    top: 360px;
-    left: 100px;
-    padding: 10px 20px;
+    top: 46px;
+    left: 1px;
+    width: 30px;
+    padding: 4px 4px;
     background-color: #007bff;
+    background: none;
     color: white;
     border: none;
     border-radius: 5px;
@@ -80,10 +89,12 @@
 
 #btnMedirApagar {
     position: absolute;
-    top: 360px;
-    left: 190px;
-    padding: 10px 20px;
+    top: 82px;
+    left: 1px;
+    width: 30px;
+    padding: 4px 4px;
     background-color: #007bff;
+    background: none;
     color: white;
     border: none;
     border-radius: 5px;
@@ -117,73 +128,80 @@
     z-index: 999;
 }
 
-
-
 #boxCotaSoleira {
     position: absolute;
-    /* top: 110px; */
-    /* left: 160px; */
     width: 80px;
-    height: 23px;
-    padding: 5px 5px;
-    background-color: #e9cc4d;
-    color: white;
+    height: 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     z-index: 999;
-    font-weight: bold;
     font-size: 16px;
     text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    color: #ffd82d;
+    background-color: #6b040441;
+    padding: 5px 5px;
 }
 
 #boxAlturaEdif {
     position: absolute;
-    /* top: 80px; */
-    /* left: 160px; */
     width: 80px;
-    height: 23px;
-    padding: 5px 5px;
-    background-color: #e9cc4d;
-    color: white;
+    height: 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     z-index: 999;
-    font-weight: bold;
     font-size: 16px;
     text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    color: #ffd82d;
+    background-color: #6b040441;
+    padding: 5px 5px;
 
 }
 
 
 #labelMarco {
-    /* position: absolute; */
-    /* top: 80px; */
-    /* left: 160px; */
-    /* width: 80px; */
-    /* height: 20px; */
-    /* padding: 5px 5px; */
-    /* background-color: #e9cc4d; */
-    /* color: white; */
-    /* border: none; */
-    /* border-radius: 5px; */
-    /* cursor: pointer; */
-    /* z-index: 999; */
     font-size: 14px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-weight: bold;
+    text-align: center;
     color: #ffd82d;
-    background-color: #6aa0f1;
+    background-color: #6b040441;
     border-radius: 5px;
     padding: 5px 5px;
 }
 
+#lblCotaMaxima {
+      /*position: absolute;*/
+    width: 80px;
+    height: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 999;
+    font-size: 16px;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    color: #5e0409ef;
+    background-color: #5f505094;
+    padding: 1px 5px;
+}
+
+#sliderMarcoAstronomico {
+    width: 230px;
+
+}
+
 #frmMarcoAstronomico {
     position: absolute;
-    top: 170px;
+    top: 60px;
     left: 10px;
-    background-color: #007bff;
+    background-color: #16213ea9;
     color: white;
     padding: 10px;
     border-radius: 5px;
@@ -207,36 +225,58 @@
     width: fit-content;
 }
 
+
 #frmControles {
-  position: fixed;
-      background: #16213e;
-      border: 1px solid #0f3460;
-      color: #e0e0e0;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      line-height: 1.6;
-      /* pointer-events: none; */
-      z-index: 999;
-      display: none;
-      box-shadow: 0 4px 16px rgba(0,0,0,.5);
-      max-width: 240px;
+    position: fixed;
+    background: #16213ea9;
+    border: 1px solid #0f3460;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    z-index: 999;
+    display: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .5);
+    max-width: 240px;
+    right: 10px;
+    top: 180px;
 }
 
-#map-tooltip {
-  position: fixed;
-      background: #16213e;
-      border: 1px solid #0f3460;
-      color: #e0e0e0;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      line-height: 1.6;
-      /* pointer-events: none; */
-      z-index: 999;
-      display: none;
-      box-shadow: 0 4px 16px rgba(0,0,0,.5);
-      max-width: 240px;
+#frmMedicoes {
+    position: fixed;
+    background: #16213ea9;
+    border: 1px solid #0f3460;
+    color: #e0e0e0;
+    padding: 5px 5px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    /*pointer-events: none;*/
+    /*display: block;*/
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .5);
+    /*max-width: 240px;*/
+    left: 10px;
+    top: 280px;
+    height: 120px;
+    width: 36px;
+    z-index: 100;
+}
+
+#map-heighttip {
+    position: fixed;
+    background: #16213e;
+    border: 1px solid #0f3460;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    /* pointer-events: none; */
+    z-index: 999;
+    display: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .5);
+    max-width: 240px;
 }
 
 #frmDownloadLotes {
@@ -251,4 +291,24 @@
     font-family: 'Courier New', Courier, monospace;
     font-size: 14px;
     width: fit-content;
+}
+
+#frmBotoes {
+    position: fixed;
+    background: #16213ea9;
+    border: 1px solid #0f3460;
+    color: #e0e0e0;
+    padding: 5px 5px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    /*pointer-events: none;*/
+    /*display: block;*/
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .5);
+    /*max-width: 240px;*/
+    left: 10px;
+    top: 150px;
+    height: 120px;
+    width: 36px;
+    z-index: 100;
 }

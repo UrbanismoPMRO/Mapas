@@ -11,11 +11,11 @@ import { selMarcoAstronomico, selTeste } from './MarcosAstron.js';
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
 const viewer = new Cesium.Viewer('cesiumContainer', {
     projectionPicker: true,
-    terrain: Cesium.Terrain.fromWorldTerrain(),
+    //terrainProvider: new Cesium.EllipsoidTerrainProvider(), //tereno 2D temporário para estudos: voltar com o debaixo.
+    terrain: Cesium.Terrain.fromWorldTerrain(), //terreno 3D: voltar com eese para o terreno 3d cesium
     shadows: true, // Habilita sombras para entidades/primitivos
     //animation: false,
     terrainShadows: Cesium.ShadowMode.ENABLED // Habilita sombras no terreno
-
 });
 
 //inicializa a base OSM para visualização alternativa
@@ -36,7 +36,7 @@ const tooltip = document.getElementById('frmControles');
 function showTooltip(x, y) {//, html) {
     //tooltip.innerHTML = html;
     tooltip.style.display = 'block';
-    moveTooltip(x, y);
+    //moveTooltip(x, y);
 }
 function moveTooltip(x, y) {
     tooltip.style.left = (x + 16) + 'px';
@@ -53,6 +53,7 @@ function pegaObjetoClicado() {
     var varCartesiano;
     var varCartografico;
 
+    /*//@3-enxerto mostrar frame do tooltip junto ao objeto quando clica em algum polígono
     const canvasClick = viewer.scene.canvas;
     canvasClick.addEventListener('click', (e) => {
         const rect = canvasClick.getBoundingClientRect();
@@ -69,6 +70,27 @@ function pegaObjetoClicado() {
             hideTooltip();
         }
     });
+    *///@3-fim
+
+    //#5-enxerto mostrar frame do tooltip quando clica em algum polígono
+    const canvasClick = viewer.scene.canvas;
+    canvasClick.addEventListener('click', (e) => {
+        const rect = canvasClick.getBoundingClientRect();
+        const mousePosition = new Cesium.Cartesian2(
+            e.clientX - rect.left,
+            e.clientY - rect.top
+        )
+
+        const picked = viewer.scene.pick(mousePosition);
+        if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id._meta) {
+            const meta = picked.id._meta;
+            showTooltip(e.clientX, e.clientY);//, html);
+        } else {
+            hideTooltip();
+        }
+    });
+    //#5-fim
+
     // 4. Capturar a posição do clique (2D - pixeis)
     handler.setInputAction(function (click) {
         // 4. Selecionar o objeto clicado
@@ -101,8 +123,10 @@ function pegaObjetoClicado() {
             }
             CotaSoleiraAtual = parseFloat(document.getElementById('boxCotaSoleira').value);
             var input = document.getElementById("boxAlturaEdif");
+            const constCotaMaxima = document.getElementById("lblCotaMaxima"); //liga com o conteudo de etiqueta de cota maxima
             // Proteção: só acessa extrudedHeight se for um polígono
             var alturaAtual = (entity.polygon && entity.polygon.extrudedHeight ? entity.polygon.extrudedHeight.getValue(Cesium.JulianDate.now()) : 0) - CotaSoleiraAtual;
+            constCotaMaxima.value = (entity.polygon && entity.polygon.extrudedHeight ? entity.polygon.extrudedHeight.getValue(Cesium.JulianDate.now()) : 0) //atribui a altura do extrudeheight a etiquwta de cota maxima
             if (alturaAtual <= 0) {
                 input.value = 0; // Define o valor da caixa de texto como a altura do edifício (ou 0 se não estiver definida)
                 console.log('<=0');
@@ -400,6 +424,10 @@ function AlturaSoleira() {
             const AlturaFinal = CotaSoleira + AlturaAtualSemSoleira; // Calcula a nova altura somando a cota de soleira com a altura atual do edifício   
             entity.polygon.extrudedHeight = AlturaFinal;
             console.log('altura final: ' + AlturaFinal);
+            //4$-atualiza o rótulo de Cota Máxima
+            const constCotaMaxima = document.getElementById("lblCotaMaxima"); //liga com o conteudo de etiqueta de cota maxima
+            constCotaMaxima.value = '...' //atribui a etiquwta de cota maxima'
+            //4$-fim
         }
     }
     //fim iteração entidaddes do dxf
@@ -450,6 +478,10 @@ function AlturaEdificacao() {
         const ConstAltura = parseFloat(document.getElementById("boxAlturaEdif").value); //pega o valor da altura no formulário
         const AlturaFinal = CotaSoleira + ConstAltura; //calcula a altura final somando a cota de soleira com a altura do edifício
         entity.polygon.extrudedHeight = AlturaFinal; //aplica a altura final na extrusão do polígono
+        //5%-Pega a cota máxima do extrudehigh do loligono e atribui ao lebal de Cota Maxima
+        const constCotaMaxima = document.getElementById("lblCotaMaxima"); //liga com o conteudo de etiqueta de cota maxima
+        constCotaMaxima.value = entity.polygon.extrudedHeight; //'(entity.polygon && entity.polygon.extrudedHeight ? entity.polygon.extrudedHeight.getValue(Cesium.JulianDate.now()) : 0) //atribui a altura do extrudeheight a etiquwta de cota maxima'
+        //5%-fim
     }
     //const entities = dataSource.entities.values;
     //for (let i = 0; i < entities.length; i++) {
