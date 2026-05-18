@@ -74,6 +74,7 @@ Medida.setInputAction(function (click) {
                     outlineColor: Cesium.Color.BLACK,
                     outlineWidth: 2,
                     style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
                     verticalOrigin: Cesium.VerticalOrigin.BOTTOM
                 }
             }));
@@ -126,6 +127,7 @@ Medida.setInputAction(function (movement) {
                         outlineColor: Cesium.Color.BLACK,
                         outlineWidth: 2,
                         style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
                         verticalOrigin: Cesium.VerticalOrigin.BOTTOM
                     }
                 });
