@@ -6,13 +6,13 @@ var map = new ol.Map({
     view: new ol.View({
          maxZoom: 28, minZoom: 1, projection: new ol.proj.Projection({
             code: 'EPSG:31984',
-            //extent: [169916.676482, 7501680.534791, 212559.653587, 7527638.475815],
+            //extent: [169916.671875, 7501680.534791, 212559.653587, 7527638.500000],
             units: 'm'})
     })
 });
 
 //initial view - epsg:3857 coordinates if not "Match project CRS"
-map.getView().fit([195749.489782, 7507696.410100, 210744.947924, 7518759.541268], map.getSize());
+map.getView().fit([182903.668137, 7501648.807757, 212894.584426, 7523775.070097], map.getSize());
 
 //full zooms only
 map.getView().setProperties({constrainResolution: true});

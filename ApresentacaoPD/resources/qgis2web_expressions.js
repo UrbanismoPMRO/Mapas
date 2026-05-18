@@ -763,3 +763,17 @@ function fnc__specialcol_(values, context) {
 function fnc_project_color(values, context) {
     return false;
 };
+
+
+
+function exp_label_LinhadeLimitedeSombreamento_13_eval_expression(context) {
+    // 'Limite de Sombreamento'
+
+    var feature = context.feature;
+    
+    if (feature.properties) {
+        return 'Limite de Sombreamento';
+    } else {
+        return 'Limite de Sombreamento';
+    }
+}
