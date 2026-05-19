@@ -1,6 +1,6 @@
 var size = 0;
 var placement = 'point';
-function categories_reasdeEstudodeSombreamentoObrigatrio_14(feature, value, size, resolution, labelText,
+function categories_reasdeEstudodeSombreamentoObrigatrio_13(feature, value, size, resolution, labelText,
                        labelFont, labelFill, bufferColor, bufferWidth,
                        placement) {
                 var valueStr = (value !== null && value !== undefined) ? value.toString() : 'default';
@@ -53,7 +53,7 @@ case '6':
     })];
                     break;}};
 
-var style_reasdeEstudodeSombreamentoObrigatrio_14 = function(feature, resolution){
+var style_reasdeEstudodeSombreamentoObrigatrio_13 = function(feature, resolution){
     var context = {
         feature: feature,
         variables: {}
@@ -73,7 +73,7 @@ var style_reasdeEstudodeSombreamentoObrigatrio_14 = function(feature, resolution
         labelText = String(feature.get("Faixa"));
     }
     
-    var style = categories_reasdeEstudodeSombreamentoObrigatrio_14(feature, value, size, resolution, labelText,
+    var style = categories_reasdeEstudodeSombreamentoObrigatrio_13(feature, value, size, resolution, labelText,
                             labelFont, labelFill, bufferColor,
                             bufferWidth, placement);
 

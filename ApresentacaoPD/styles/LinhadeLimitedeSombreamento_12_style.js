@@ -1,7 +1,7 @@
 var size = 0;
 var placement = 'point';
 
-var style_LinhadeLimitedeSombreamento_13 = function(feature, resolution){
+var style_LinhadeLimitedeSombreamento_12 = function(feature, resolution){
     var context = {
         feature: feature,
         variables: {}
@@ -17,8 +17,8 @@ var style_LinhadeLimitedeSombreamento_13 = function(feature, resolution){
     var offsetX = 0;
     var offsetY = 0;
     var placement = 'line';
-    if (exp_label_LinhadeLimitedeSombreamento_13_eval_expression(context) !== null) {
-        labelText = String(exp_label_LinhadeLimitedeSombreamento_13_eval_expression(context));
+    if (exp_label_LinhadeLimitedeSombreamento_12_eval_expression(context) !== null) {
+        labelText = String(exp_label_LinhadeLimitedeSombreamento_12_eval_expression(context));
     }
     var style = [ new ol.style.Style({
         stroke: new ol.style.Stroke({color: 'rgba(255,0,124,1.0)', lineDash: [3.8,7.6], lineCap: 'square', lineJoin: 'bevel', width: 3.8}),
