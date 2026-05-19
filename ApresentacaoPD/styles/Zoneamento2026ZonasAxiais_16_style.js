@@ -52,6 +52,14 @@ case 'EEZCS3':
                               bufferWidth)
     })];
                     break;
+case 'EEZCS4':
+                    return [ new ol.style.Style({
+        stroke: new ol.style.Stroke({color: 'rgba(255,213,155,1.0)', lineDash: null, lineCap: 'square', lineJoin: 'bevel', width: 3.8}),
+        text: createTextStyle(feature, resolution, labelText, labelFont,
+                              labelFill, placement, bufferColor,
+                              bufferWidth)
+    })];
+                    break;
 case 'EEZIT5':
                     return [ new ol.style.Style({
         stroke: new ol.style.Stroke({color: 'rgba(84,111,84,1.0)', lineDash: null, lineCap: 'square', lineJoin: 'bevel', width: 3.8}),
@@ -151,14 +159,6 @@ case 'EPZIT6':
 case 'EPZUMPL':
                     return [ new ol.style.Style({
         stroke: new ol.style.Stroke({color: 'rgba(0,144,0,1.0)', lineDash: [3.8,7.6], lineCap: 'square', lineJoin: 'bevel', width: 3.8}),
-        text: createTextStyle(feature, resolution, labelText, labelFont,
-                              labelFill, placement, bufferColor,
-                              bufferWidth)
-    })];
-                    break;
-default:
-                    return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(0,255,0,1.0)', lineDash: null, lineCap: 'square', lineJoin: 'bevel', width: 3.8}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)

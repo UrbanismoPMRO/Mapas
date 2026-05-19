@@ -1,5 +1,5 @@
 ol.proj.proj4.register(proj4);
-//ol.proj.get("EPSG:31984").setExtent([182903.668137, 7501648.807757, 212894.584426, 7523775.070097]);
+//ol.proj.get("EPSG:31984").setExtent([184032.135209, 7500797.265120, 214023.051497, 7522923.527460]);
 var wms_layers = [];
 
 
@@ -121,17 +121,8 @@ var lyr_ARIE_Itapebussus_7 = new ol.layer.Vector({
                 style: style_ARIE_Itapebussus_7,
                 popuplayertitle: 'ARIE_Itapebussus',
                 interactive: true,
-    title: 'ARIE_Itapebussus<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_0.png" /> Zona de Adequação Ambiental<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_1.png" /> Zona de Conservação<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_2.png" /> Zona de Diferentes Interesses Públicos<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_3.png" /> Zona de Infraestrutura<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_4.png" /> Zona Populacional<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_5.png" /> Zona Produtiva<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_6.png" /> Zona de Sobreposição Territorial<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_7.png" /> Zona de Uso Moderado<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_8.png" /> Zona de Uso Restrito<br />\
-    <img src="styles/legend/ARIE_Itapebussus_7_9.png" /> Zona de Amortecimento<br />' });
+                title: '<img src="styles/legend/ARIE_Itapebussus_7.png" /> ARIE_Itapebussus'
+            });
 var format_PMMNCostesRochosos_8 = new ol.format.GeoJSON();
 var features_PMMNCostesRochosos_8 = format_PMMNCostesRochosos_8.readFeatures(json_PMMNCostesRochosos_8, 
             {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:31984'});
@@ -166,15 +157,8 @@ var lyr_APALagoadeIriry_9 = new ol.layer.Vector({
                 style: style_APALagoadeIriry_9,
                 popuplayertitle: 'APA Lagoa de Iriry',
                 interactive: true,
-    title: 'APA Lagoa de Iriry<br />\
-    <img src="styles/legend/APALagoadeIriry_9_0.png" /> ZP1 - Zona Populacional 1<br />\
-    <img src="styles/legend/APALagoadeIriry_9_1.png" /> ZP2 - Zona Populacional 2<br />\
-    <img src="styles/legend/APALagoadeIriry_9_2.png" /> ZP3 - Zona Populacional 3<br />\
-    <img src="styles/legend/APALagoadeIriry_9_3.png" /> ZAA - Zona de Adequação Ambiental<br />\
-    <img src="styles/legend/APALagoadeIriry_9_4.png" /> ZC - Zona de Conservação<br />\
-    <img src="styles/legend/APALagoadeIriry_9_5.png" /> ZI - Zona de Infraestrutura<br />\
-    <img src="styles/legend/APALagoadeIriry_9_6.png" /> ZUM - Zona de Uso Moderado<br />\
-    <img src="styles/legend/APALagoadeIriry_9_7.png" /> <br />' });
+                title: '<img src="styles/legend/APALagoadeIriry_9.png" /> APA Lagoa de Iriry'
+            });
 var format_ZEIMA1_10 = new ol.format.GeoJSON();
 var features_ZEIMA1_10 = format_ZEIMA1_10.readFeatures(json_ZEIMA1_10, 
             {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:31984'});
@@ -344,20 +328,20 @@ var lyr_Zoneamento2026ZonasAxiais_16 = new ol.layer.Vector({
     <img src="styles/legend/Zoneamento2026ZonasAxiais_16_3.png" /> Zona Comercial e Serviço 1<br />\
     <img src="styles/legend/Zoneamento2026ZonasAxiais_16_4.png" /> Zona Comercial e Serviço 2<br />\
     <img src="styles/legend/Zoneamento2026ZonasAxiais_16_5.png" /> Zona Comercial e Serviço 3<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_6.png" /> Zona de Interesse Turístico 5<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_7.png" /> Zona de Interesse Turístico 6<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_8.png" /> Zona Uso Misto  Parque Linear<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_9.png" /> Zona de Uso Misto 1<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_10.png" /> Zona de Uso Misto 2<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_11.png" /> Zona de Uso Misto 3<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_12.png" /> Zona Comercial e Serviço1<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_13.png" /> Zona Comercial e Serviço2<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_14.png" /> Zona Comercial e Serviço3<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_15.png" /> TEMPORÁRIO<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_16.png" /> Zona de Interesse Turístico 5<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_17.png" /> Zona de Interesse Turístico 6<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_18.png" /> Zona Uso Misto  Parque Linear<br />\
-    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_19.png" /> <br />' });
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_6.png" /> <br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_7.png" /> Zona de Interesse Turístico 5<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_8.png" /> Zona de Interesse Turístico 6<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_9.png" /> Zona Uso Misto  Parque Linear<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_10.png" /> Zona de Uso Misto 1<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_11.png" /> Zona de Uso Misto 2<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_12.png" /> Zona de Uso Misto 3<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_13.png" /> Zona Comercial e Serviço1<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_14.png" /> Zona Comercial e Serviço2<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_15.png" /> Zona Comercial e Serviço3<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_16.png" /> TEMPORÁRIO<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_17.png" /> Zona de Interesse Turístico 5<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_18.png" /> Zona de Interesse Turístico 6<br />\
+    <img src="styles/legend/Zoneamento2026ZonasAxiais_16_19.png" /> Zona Uso Misto  Parque Linear<br />' });
 var group_ZonoamentoNovo = new ol.layer.Group({
                                 layers: [lyr_Zoneamento2026Zonas_15,lyr_Zoneamento2026ZonasAxiais_16,],
                                 fold: 'close',
@@ -386,8 +370,8 @@ lyr_Parque_dos_Passaros_11.set('fieldAliases', {'fid': 'fid', 'id': 'id', 'Name'
 lyr_ZoneamentoLC902023_12.set('fieldAliases', {'fid': 'fid', 'Name': 'Nome', 'Zona': 'Zona', 'Parâmetros': 'parametros', 'ParametrosHTML': 'ParametrosHTML', });
 lyr_LinhadeLimitedeSombreamento_13.set('fieldAliases', {'fid': 'fid', 'Alt_Max': 'Altura Máxima', 'Nome': 'Nome', });
 lyr_reasdeEstudodeSombreamentoObrigatrio_14.set('fieldAliases', {'fid': 'fid', 'Faixa': 'Faixa', 'LimAlt': 'Limite de Altura', 'Setor': 'Setor', 'Cod_Faixa': 'Cod_Faixa', });
-lyr_Zoneamento2026Zonas_15.set('fieldAliases', {'fid': 'fid', 'Zona': 'Zona', 'Nome': 'Nome', 'HTML': 'HTML', 'OBS': 'OBS', 'Status': 'Status', 'Status_Data': 'Data da alteração', 'Status_Resp': 'Respons. alteração', 'Revisao': 'Revisão', 'parametros': 'Parâmetros', });
-lyr_Zoneamento2026ZonasAxiais_16.set('fieldAliases', {'fid': 'fid', 'Zona': 'Zona', 'OBS': 'OBS', 'TITULO': 'TITULO', 'Revisao': 'Revisão', 'Revisao_Data': 'Data da Revisão', 'Revisao_Resp': 'Responsável Revisão', 'Verificar': 'Verificar', 'T_Eixo': 'Tipo Eixo', 'parametros': 'Parâmetros', });
+lyr_Zoneamento2026Zonas_15.set('fieldAliases', {'fid': 'fid', 'Zona': 'Zona', 'Nome': 'Nome', 'HTML': 'HTML', 'OBS': 'OBS', 'Status': 'Status', 'Status_Data': 'Data da alteração', 'Status_Resp': 'Respons. alteração', 'Revisao': 'Revisão', 'parametros': 'Parâmetros', 'Testada': 'Testada', 'Lote Mínimo': 'Lote Mínimo', 'T.O.': 'T.O.', 'C.A.': 'C.A.', 'Altura': 'Altura', });
+lyr_Zoneamento2026ZonasAxiais_16.set('fieldAliases', {'fid': 'fid', 'Zona': 'Zona', 'OBS': 'OBS', 'TITULO': 'TITULO', 'Revisao': 'Revisão', 'Revisao_Data': 'Data da Revisão', 'Revisao_Resp': 'Responsável Revisão', 'Verificar': 'Verificar', 'T_Eixo': 'Tipo Eixo', 'parametros': 'Parâmetros', 'Testada': 'Testada', 'Lote Mínimo': 'Lote Mínimo', 'T.O.': 'T.O.', 'C.A.': 'C.A.', 'Altura': 'Altura', });
 lyr_LimiteMunicipal_2.set('fieldImages', {'fid': '', });
 lyr_RiscoDeslizamento_3.set('fieldImages', {'fid': '', });
 lyr_reasAlagveis_4.set('fieldImages', {'fid': '', 'Levantamento': '', });
@@ -401,8 +385,8 @@ lyr_Parque_dos_Passaros_11.set('fieldImages', {'fid': '', 'id': '', 'Name': '', 
 lyr_ZoneamentoLC902023_12.set('fieldImages', {'fid': 'TextEdit', 'Name': 'TextEdit', 'Zona': 'TextEdit', 'Parâmetros': 'TextEdit', 'ParametrosHTML': 'TextEdit', });
 lyr_LinhadeLimitedeSombreamento_13.set('fieldImages', {'fid': 'TextEdit', 'Alt_Max': 'TextEdit', 'Nome': 'TextEdit', });
 lyr_reasdeEstudodeSombreamentoObrigatrio_14.set('fieldImages', {'fid': 'TextEdit', 'Faixa': 'TextEdit', 'LimAlt': 'TextEdit', 'Setor': 'TextEdit', 'Cod_Faixa': 'Range', });
-lyr_Zoneamento2026Zonas_15.set('fieldImages', {'fid': 'TextEdit', 'Zona': 'TextEdit', 'Nome': 'TextEdit', 'HTML': 'TextEdit', 'OBS': 'TextEdit', 'Status': 'Range', 'Status_Data': 'DateTime', 'Status_Resp': 'TextEdit', 'Revisao': 'TextEdit', 'parametros': 'TextEdit', });
-lyr_Zoneamento2026ZonasAxiais_16.set('fieldImages', {'fid': 'TextEdit', 'Zona': 'TextEdit', 'OBS': 'TextEdit', 'TITULO': 'TextEdit', 'Revisao': 'CheckBox', 'Revisao_Data': 'DateTime', 'Revisao_Resp': 'TextEdit', 'Verificar': 'CheckBox', 'T_Eixo': 'TextEdit', 'parametros': 'TextEdit', });
+lyr_Zoneamento2026Zonas_15.set('fieldImages', {'fid': 'TextEdit', 'Zona': 'TextEdit', 'Nome': 'TextEdit', 'HTML': 'TextEdit', 'OBS': 'TextEdit', 'Status': 'Range', 'Status_Data': 'DateTime', 'Status_Resp': 'TextEdit', 'Revisao': 'TextEdit', 'parametros': 'TextEdit', 'Testada': 'TextEdit', 'Lote Mínimo': 'TextEdit', 'T.O.': 'TextEdit', 'C.A.': 'TextEdit', 'Altura': 'TextEdit', });
+lyr_Zoneamento2026ZonasAxiais_16.set('fieldImages', {'fid': 'TextEdit', 'Zona': 'TextEdit', 'OBS': 'TextEdit', 'TITULO': 'TextEdit', 'Revisao': 'CheckBox', 'Revisao_Data': 'DateTime', 'Revisao_Resp': 'TextEdit', 'Verificar': 'CheckBox', 'T_Eixo': 'TextEdit', 'parametros': 'TextEdit', 'Testada': 'TextEdit', 'Lote Mínimo': 'TextEdit', 'T.O.': 'TextEdit', 'C.A.': 'TextEdit', 'Altura': 'TextEdit', });
 lyr_LimiteMunicipal_2.set('fieldLabels', {'fid': 'no label', });
 lyr_RiscoDeslizamento_3.set('fieldLabels', {'fid': 'hidden field', });
 lyr_reasAlagveis_4.set('fieldLabels', {'fid': 'hidden field', 'Levantamento': 'hidden field', });
@@ -416,8 +400,8 @@ lyr_Parque_dos_Passaros_11.set('fieldLabels', {'fid': 'no label', 'id': 'no labe
 lyr_ZoneamentoLC902023_12.set('fieldLabels', {'fid': 'hidden field', 'Name': 'no label', 'Zona': 'hidden field', 'Parâmetros': 'hidden field', 'ParametrosHTML': 'no label', });
 lyr_LinhadeLimitedeSombreamento_13.set('fieldLabels', {'fid': 'no label', 'Alt_Max': 'no label', 'Nome': 'no label', });
 lyr_reasdeEstudodeSombreamentoObrigatrio_14.set('fieldLabels', {'fid': 'hidden field', 'Faixa': 'no label', 'LimAlt': 'hidden field', 'Setor': 'hidden field', 'Cod_Faixa': 'hidden field', });
-lyr_Zoneamento2026Zonas_15.set('fieldLabels', {'fid': 'hidden field', 'Zona': 'hidden field', 'Nome': 'hidden field', 'HTML': 'hidden field', 'OBS': 'hidden field', 'Status': 'hidden field', 'Status_Data': 'hidden field', 'Status_Resp': 'hidden field', 'Revisao': 'hidden field', 'parametros': 'no label', });
-lyr_Zoneamento2026ZonasAxiais_16.set('fieldLabels', {'fid': 'hidden field', 'Zona': 'hidden field', 'OBS': 'hidden field', 'TITULO': 'hidden field', 'Revisao': 'hidden field', 'Revisao_Data': 'hidden field', 'Revisao_Resp': 'hidden field', 'Verificar': 'hidden field', 'T_Eixo': 'hidden field', 'parametros': 'no label', });
+lyr_Zoneamento2026Zonas_15.set('fieldLabels', {'fid': 'hidden field', 'Zona': 'no label', 'Nome': 'hidden field', 'HTML': 'hidden field', 'OBS': 'hidden field', 'Status': 'hidden field', 'Status_Data': 'hidden field', 'Status_Resp': 'hidden field', 'Revisao': 'hidden field', 'parametros': 'hidden field', 'Testada': 'inline label - visible with data', 'Lote Mínimo': 'inline label - visible with data', 'T.O.': 'inline label - visible with data', 'C.A.': 'inline label - visible with data', 'Altura': 'inline label - visible with data', });
+lyr_Zoneamento2026ZonasAxiais_16.set('fieldLabels', {'fid': 'hidden field', 'Zona': 'hidden field', 'OBS': 'hidden field', 'TITULO': 'no label', 'Revisao': 'hidden field', 'Revisao_Data': 'hidden field', 'Revisao_Resp': 'hidden field', 'Verificar': 'hidden field', 'T_Eixo': 'hidden field', 'parametros': 'hidden field', 'Testada': 'inline label - visible with data', 'Lote Mínimo': 'inline label - visible with data', 'T.O.': 'inline label - visible with data', 'C.A.': 'inline label - visible with data', 'Altura': 'inline label - visible with data', });
 lyr_Zoneamento2026ZonasAxiais_16.on('precompose', function(evt) {
     evt.context.globalCompositeOperation = 'normal';
 });
