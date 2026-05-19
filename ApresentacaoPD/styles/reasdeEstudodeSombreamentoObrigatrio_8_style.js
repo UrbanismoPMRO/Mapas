@@ -1,87 +1,79 @@
 var size = 0;
 var placement = 'point';
-function categories_PMMNCostesRochosos_8(feature, value, size, resolution, labelText,
+function categories_reasdeEstudodeSombreamentoObrigatrio_8(feature, value, size, resolution, labelText,
                        labelFont, labelFill, bufferColor, bufferWidth,
                        placement) {
                 var valueStr = (value !== null && value !== undefined) ? value.toString() : 'default';
-                switch(valueStr) {case 'ZA':
+                switch(valueStr) {case '1':
                     return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(35,35,35,0.5)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.988}),fill: new ol.style.Fill({color: 'rgba(243,232,225,0.5)'}),
+        fill: new ol.style.Fill({color: 'rgba(8,85,120,0.6)'}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)
     })];
                     break;
-case 'ZP':
+case '2':
                     return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(35,35,35,0.5)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.988}),fill: new ol.style.Fill({color: 'rgba(134,187,103,0.5)'}),
+        fill: new ol.style.Fill({color: 'rgba(118,128,133,0.6)'}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)
     })];
                     break;
-case 'ZR':
+case '3':
                     return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(35,35,35,0.5)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.988}),fill: new ol.style.Fill({color: 'rgba(187,253,134,0.5)'}),
+        fill: new ol.style.Fill({color: 'rgba(250,241,226,0.6)'}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)
     })];
                     break;
-case 'ZOC':
+case '4':
                     return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(35,35,35,0.5)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.988}),fill: new ol.style.Fill({color: 'rgba(241,184,47,0.5)'}),
+        fill: new ol.style.Fill({color: 'rgba(227,186,170,0.6)'}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)
     })];
                     break;
-case 'ZUE':
+case '5':
                     return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(35,35,35,0.5)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.988}),fill: new ol.style.Fill({color: 'rgba(137,50,4,0.5)'}),
+        fill: new ol.style.Fill({color: 'rgba(228,126,140,0.6)'}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)
     })];
                     break;
-case 'ZUI':
+case '6':
                     return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(35,35,35,0.5)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.988}),fill: new ol.style.Fill({color: 'rgba(200,218,16,0.5)'}),
-        text: createTextStyle(feature, resolution, labelText, labelFont,
-                              labelFill, placement, bufferColor,
-                              bufferWidth)
-    })];
-                    break;
-case 'Limite UC':
-                    return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(35,35,35,0.5)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.988}),fill: new ol.style.Fill({color: 'rgba(243,166,178,0.5)'}),
+        fill: new ol.style.Fill({color: 'rgba(255,170,106,0.6)'}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)
     })];
                     break;}};
 
-var style_PMMNCostesRochosos_8 = function(feature, resolution){
+var style_reasdeEstudodeSombreamentoObrigatrio_8 = function(feature, resolution){
     var context = {
         feature: feature,
         variables: {}
     };
     
     var labelText = ""; 
-    var value = feature.get("Zona");
-    var labelFont = "14.3px \'Segoe UI Semibold\', sans-serif";
+    var value = feature.get("Cod_Faixa");
+    var labelFont = "13.0px \'Open Sans\', sans-serif";
     var labelFill = "#fdf532";
-    var bufferColor = "#525c5c";
-    var bufferWidth = 1.5;
+    var bufferColor = "";
+    var bufferWidth = 0;
     var textAlign = "left";
     var offsetX = 0;
     var offsetY = 0;
     var placement = 'point';
-    if (feature.get("Zona") !== null) {
-        labelText = String(feature.get("Zona"));
+    if (feature.get("Faixa") !== null) {
+        labelText = String(feature.get("Faixa"));
     }
     
-    var style = categories_PMMNCostesRochosos_8(feature, value, size, resolution, labelText,
+    var style = categories_reasdeEstudodeSombreamentoObrigatrio_8(feature, value, size, resolution, labelText,
                             labelFont, labelFill, bufferColor,
                             bufferWidth, placement);
 

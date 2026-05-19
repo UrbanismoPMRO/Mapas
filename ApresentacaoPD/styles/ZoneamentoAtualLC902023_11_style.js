@@ -1,6 +1,6 @@
 var size = 0;
 var placement = 'point';
-function categories_ZoneamentoAtualLC902023_16(feature, value, size, resolution, labelText,
+function categories_ZoneamentoAtualLC902023_11(feature, value, size, resolution, labelText,
                        labelFont, labelFill, bufferColor, bufferWidth,
                        placement) {
                 var valueStr = (value !== null && value !== undefined) ? value.toString() : 'default';
@@ -149,7 +149,7 @@ case 'Rios':
     })];
                     break;}};
 
-var style_ZoneamentoAtualLC902023_16 = function(feature, resolution){
+var style_ZoneamentoAtualLC902023_11 = function(feature, resolution){
     var context = {
         feature: feature,
         variables: {}
@@ -169,7 +169,7 @@ var style_ZoneamentoAtualLC902023_16 = function(feature, resolution){
         labelText = String(feature.get("Zona"));
     }
     
-    var style = categories_ZoneamentoAtualLC902023_16(feature, value, size, resolution, labelText,
+    var style = categories_ZoneamentoAtualLC902023_11(feature, value, size, resolution, labelText,
                             labelFont, labelFill, bufferColor,
                             bufferWidth, placement);
 
