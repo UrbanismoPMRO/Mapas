@@ -766,7 +766,7 @@ function fnc_project_color(values, context) {
 
 
 
-function exp_Educao_5rule0_eval_expression(context) {
+function exp_Educao_4rule0_eval_expression(context) {
     // Modalidade = 'Superior' AND Administração = 'Federal'
 
     var feature = context.feature;
@@ -779,7 +779,7 @@ function exp_Educao_5rule0_eval_expression(context) {
 }
 
 
-function exp_Educao_5rule1_eval_expression(context) {
+function exp_Educao_4rule1_eval_expression(context) {
     // Modalidade = 'Médio' AND Administração = 'Estadual'
 
     var feature = context.feature;
@@ -792,7 +792,7 @@ function exp_Educao_5rule1_eval_expression(context) {
 }
 
 
-function exp_Educao_5rule2_eval_expression(context) {
+function exp_Educao_4rule2_eval_expression(context) {
     // Modalidade = 'Básico' AND Administração = 'Municipal'
 
     var feature = context.feature;
@@ -801,18 +801,5 @@ function exp_Educao_5rule2_eval_expression(context) {
         return ((feature.get('Modalidade')  == 'Básico') && (feature.get('Administração')  == 'Municipal'));
     } else {
         return ((feature.get('Modalidade')  == 'Básico') && (feature.get('Administração')  == 'Municipal'));
-    }
-}
-
-
-function exp_label_ARIEItapebussus_20_eval_expression(context) {
-    // Zona
-
-    var feature = context.feature;
-    
-    if (feature.properties) {
-        return feature.get('Zona') ;
-    } else {
-        return feature.get('Zona') ;
     }
 }
